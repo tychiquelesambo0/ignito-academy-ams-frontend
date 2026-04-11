@@ -5,9 +5,9 @@
 import {
   calculateAge,
   calculateScholarshipEligibility,
-  hasReachedScholarshipLimit,
+  hasReachedScholarshipAwardLimit,
   formatEligibilityReasons,
-  MAX_SCHOLARSHIPS_PER_YEAR,
+  MAX_SCHOLARSHIPS_AWARDED_PER_YEAR,
   MIN_GRADE_AVERAGE,
   MAX_AGE_ON_SEPTEMBER_1ST,
   MIN_GRADUATION_YEAR,
@@ -202,38 +202,38 @@ describe('calculateScholarshipEligibility', () => {
   })
 })
 
-describe('hasReachedScholarshipLimit', () => {
-  it('should return false when under limit', () => {
-    const result = hasReachedScholarshipLimit(10)
+describe('hasReachedScholarshipAwardLimit', () => {
+  it('should return false when under award limit', () => {
+    const result = hasReachedScholarshipAwardLimit(10)
     
     expect(result.limitReached).toBe(false)
     expect(result.currentCount).toBe(10)
-    expect(result.maxScholarships).toBe(MAX_SCHOLARSHIPS_PER_YEAR)
+    expect(result.maxScholarships).toBe(MAX_SCHOLARSHIPS_AWARDED_PER_YEAR)
   })
 
-  it('should return true when at limit', () => {
-    const result = hasReachedScholarshipLimit(20)
+  it('should return true when at award limit', () => {
+    const result = hasReachedScholarshipAwardLimit(20)
     
     expect(result.limitReached).toBe(true)
     expect(result.currentCount).toBe(20)
   })
 
-  it('should return true when over limit', () => {
-    const result = hasReachedScholarshipLimit(21)
+  it('should return true when over award limit', () => {
+    const result = hasReachedScholarshipAwardLimit(21)
     
     expect(result.limitReached).toBe(true)
     expect(result.currentCount).toBe(21)
   })
 
-  it('should return false when at 0', () => {
-    const result = hasReachedScholarshipLimit(0)
+  it('should return false when at 0 awards', () => {
+    const result = hasReachedScholarshipAwardLimit(0)
     
     expect(result.limitReached).toBe(false)
     expect(result.currentCount).toBe(0)
   })
 
-  it('should return false when at 19 (one below limit)', () => {
-    const result = hasReachedScholarshipLimit(19)
+  it('should return false when at 19 awards (one below limit)', () => {
+    const result = hasReachedScholarshipAwardLimit(19)
     
     expect(result.limitReached).toBe(false)
     expect(result.currentCount).toBe(19)
@@ -268,7 +268,7 @@ describe('formatEligibilityReasons', () => {
 
 describe('Constants', () => {
   it('should have correct constant values', () => {
-    expect(MAX_SCHOLARSHIPS_PER_YEAR).toBe(20)
+    expect(MAX_SCHOLARSHIPS_AWARDED_PER_YEAR).toBe(20)
     expect(MIN_GRADE_AVERAGE).toBe(70)
     expect(MAX_AGE_ON_SEPTEMBER_1ST).toBe(19)
     expect(MIN_GRADUATION_YEAR).toBe(2024)

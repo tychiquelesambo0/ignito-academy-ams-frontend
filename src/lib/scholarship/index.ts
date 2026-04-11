@@ -9,9 +9,9 @@ export type { EligibilityResult, ScholarshipLimitResult } from './eligibility'
 export {
   calculateAge,
   calculateScholarshipEligibility,
-  hasReachedScholarshipLimit,
+  hasReachedScholarshipAwardLimit,
   formatEligibilityReasons,
-  MAX_SCHOLARSHIPS_PER_YEAR,
+  MAX_SCHOLARSHIPS_AWARDED_PER_YEAR,
   MIN_GRADE_AVERAGE,
   MAX_AGE_ON_SEPTEMBER_1ST,
   MIN_GRADUATION_YEAR,

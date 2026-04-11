@@ -33,17 +33,19 @@ export interface ScholarshipLimitResult {
   /** Has the limit been reached? */
   limitReached: boolean
   
-  /** Current number of scholarships awarded */
+  /** Current number of scholarships AWARDED (not applications) */
   currentCount: number
   
-  /** Maximum scholarships allowed */
+  /** Maximum scholarships that can be AWARDED */
   maxScholarships: number
 }
 
 /**
- * Maximum scholarships per intake year
+ * Maximum scholarships that can be AWARDED per intake year
+ * NOTE: This is NOT a limit on applications - unlimited applicants can apply
+ * This limit is only enforced when AWARDING scholarships after interviews
  */
-export const MAX_SCHOLARSHIPS_PER_YEAR = 20
+export const MAX_SCHOLARSHIPS_AWARDED_PER_YEAR = 20
 
 /**
  * Minimum grade average required for scholarship
@@ -193,16 +195,19 @@ export function calculateScholarshipEligibility(params: {
 }
 
 /**
- * Check if scholarship limit has been reached for a given intake year
+ * Check if scholarship award limit has been reached for a given intake year
  * 
- * @param currentCount - Current number of scholarships awarded
+ * IMPORTANT: This checks if scholarships can be AWARDED, not if applicants can APPLY
+ * Unlimited applicants can apply - this limit is only for awarding after interviews
+ * 
+ * @param currentCount - Current number of scholarships AWARDED (not applications)
  * @returns Limit check result
  */
-export function hasReachedScholarshipLimit(currentCount: number): ScholarshipLimitResult {
+export function hasReachedScholarshipAwardLimit(currentCount: number): ScholarshipLimitResult {
   return {
-    limitReached: currentCount >= MAX_SCHOLARSHIPS_PER_YEAR,
+    limitReached: currentCount >= MAX_SCHOLARSHIPS_AWARDED_PER_YEAR,
     currentCount,
-    maxScholarships: MAX_SCHOLARSHIPS_PER_YEAR,
+    maxScholarships: MAX_SCHOLARSHIPS_AWARDED_PER_YEAR,
   }
 }
 
