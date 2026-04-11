@@ -169,14 +169,15 @@ This document breaks down the implementation into manageable tasks organized by 
 ### Task 7: USD Single-Currency Enforcement
 **Priority:** Critical  
 **Estimated Effort:** 2-3 hours
+**Status:** ✅ COMPLETE
 
-- [ ] 7.1 Create currency utility (src/lib/payment/currency.ts)
-- [ ] 7.2 Define Currency type as single literal: `export type Currency = 'USD';`
-- [ ] 7.3 Define APPLICATION_FEE_USD constant (29 USD)
-- [ ] 7.4 Create validateCurrency() function (rejects non-USD)
-- [ ] 7.5 Create validatePaymentAmount() function (must equal 29 USD)
-- [ ] 7.6 Add database migration for USD-only constraints
-- [ ] 7.7 Test that non-USD payments are rejected
+- [x] 7.1 Create currency utility (src/lib/payment/currency.ts)
+- [x] 7.2 Define Currency type as single literal: `export type Currency = 'USD';`
+- [x] 7.3 Define APPLICATION_FEE_USD constant (29 USD)
+- [x] 7.4 Create validateCurrency() function (rejects non-USD)
+- [x] 7.5 Create validatePaymentAmount() function (must equal 29 USD)
+- [x] 7.6 Add database migration for USD-only constraints
+- [x] 7.7 Test that non-USD payments are rejected
 
 **Acceptance Criteria:**
 - Currency type is single literal 'USD' (NOT union type)
