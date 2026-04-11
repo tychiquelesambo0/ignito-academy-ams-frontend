@@ -197,15 +197,16 @@ This document breaks down the implementation into manageable tasks organized by 
 ### Task 8: Scholarship Eligibility Calculation
 **Priority:** High  
 **Estimated Effort:** 3-4 hours
+**Status:** ✅ COMPLETE
 
-- [ ] 8.1 Create eligibility utility (src/lib/scholarship/eligibility.ts)
-- [ ] 8.2 Implement calculateAge() with September 1st anchor
-- [ ] 8.3 Implement calculateScholarshipEligibility() function
-- [ ] 8.4 Check all grade averages >= 70%
-- [ ] 8.5 Check age < 20 on September 1st of intake year
-- [ ] 8.6 Check graduation year >= 2024
-- [ ] 8.7 Return detailed reasons for ineligibility
-- [ ] 8.8 Implement hasReachedScholarshipLimit() function
+- [x] 8.1 Create eligibility utility (src/lib/scholarship/eligibility.ts)
+- [x] 8.2 Implement calculateAge() with September 1st anchor
+- [x] 8.3 Implement calculateScholarshipEligibility() function
+- [x] 8.4 Check all grade averages >= 70%
+- [x] 8.5 Check age < 20 on September 1st of intake year
+- [x] 8.6 Check graduation year >= 2024
+- [x] 8.7 Return detailed reasons for ineligibility
+- [x] 8.8 Implement hasReachedScholarshipLimit() function
 
 **Acceptance Criteria:**
 - Eligibility calculated correctly based on grades, age, graduation year
