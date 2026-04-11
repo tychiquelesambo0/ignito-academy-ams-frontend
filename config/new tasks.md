@@ -250,17 +250,18 @@ This document breaks down the implementation into manageable tasks organized by 
 ### Task 10: Scholarship UI Components (URL Input ONLY)
 **Priority:** Medium  
 **Estimated Effort:** 4-5 hours
+**Status:** ✅ COMPLETE
 
-- [ ] 10.1 Create ScholarshipVideoInput component (text input, NOT file upload)
-- [ ] 10.2 Add video URL text input field (type="url")
-- [ ] 10.3 Implement real-time URL validation
-- [ ] 10.4 Show video preview on valid URL (iframe embed)
-- [ ] 10.5 Display validation errors in French
-- [ ] 10.6 Create ScholarshipVideoPlayer component (admin)
-- [ ] 10.7 Embed video using iframe
-- [ ] 10.8 Display raw URL as clickable link
-- [ ] 10.9 Handle invalid URLs gracefully
-- [ ] 10.10 Verify NO file upload input elements exist
+- [x] 10.1 Create ScholarshipVideoInput component (text input, NOT file upload)
+- [x] 10.2 Add video URL text input field (type="url")
+- [x] 10.3 Implement real-time URL validation
+- [x] 10.4 Show video preview on valid URL (iframe embed)
+- [x] 10.5 Display validation errors in French
+- [x] 10.6 Create ScholarshipVideoPlayer component (admin)
+- [x] 10.7 Embed video using iframe
+- [x] 10.8 Display raw URL as clickable link
+- [x] 10.9 Handle invalid URLs gracefully
+- [x] 10.10 Verify NO file upload input elements exist
 
 **Acceptance Criteria:**
 - Applicants can paste YouTube/Vimeo URLs in text input
