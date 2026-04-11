@@ -73,7 +73,7 @@ export default function AcademicPage() {
     loadAcademic()
   }, [setValue])
 
-  const onSubmit = async (data: AcademicHistoryFormData) {
+  const onSubmit = async (data: AcademicHistoryFormData) => {
     setSaving(true)
     setSaveSuccess(false)
     setSaveError(null)
