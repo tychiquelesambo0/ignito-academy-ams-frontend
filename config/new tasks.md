@@ -222,16 +222,16 @@ This document breaks down the implementation into manageable tasks organized by 
 ### Task 9: Video URL Validation (NO File Uploads)
 **Priority:** High  
 **Estimated Effort:** 2-3 hours
+**Status:** ✅ COMPLETE
 
-
-- [ ] 9.1 Create video validation utility (src/lib/scholarship/video-validation.ts)
-- [ ] 9.2 Implement validateVideoURL() function
-- [ ] 9.3 Add YouTube URL regex patterns (watch, youtu.be, embed)
-- [ ] 9.4 Add Vimeo URL regex patterns
-- [ ] 9.5 Extract video ID and generate embed URL
-- [ ] 9.6 Create Zod schema for video URL validation
-- [ ] 9.7 Test with various URL formats
-- [ ] 9.8 Verify NO video file upload functionality exists
+- [x] 9.1 Create video validation utility (src/lib/scholarship/video-validation.ts)
+- [x] 9.2 Implement validateVideoURL() function
+- [x] 9.3 Add YouTube URL regex patterns (watch, youtu.be, embed, shorts)
+- [x] 9.4 Add Vimeo URL regex patterns (standard, player)
+- [x] 9.5 Extract video ID and generate embed URL
+- [x] 9.6 Create Zod schema for video URL validation
+- [x] 9.7 Test with various URL formats
+- [x] 9.8 Verify NO video file upload functionality exists
 
 **Acceptance Criteria:**
 - YouTube URLs validated correctly (including unlisted)
