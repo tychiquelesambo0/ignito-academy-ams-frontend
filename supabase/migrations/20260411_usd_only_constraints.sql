@@ -33,15 +33,14 @@ CHECK (
 -- 3. Add CHECK constraint to refund_transactions table
 -- ============================================================================
 
--- Ensure all refunds are in USD
-ALTER TABLE refund_transactions
-ADD CONSTRAINT refund_transactions_currency_check 
-CHECK (currency = 'USD');
+-- Note: refund_transactions already has chk_refund_currency (currency = 'USD')
+-- Note: refund_transactions already has chk_refund_amount (amount > 0)
+-- We'll add an additional constraint for maximum refund amount
 
--- Ensure refund amount is positive and reasonable
+-- Ensure refund amount is reasonable (max $10,000)
 ALTER TABLE refund_transactions
-ADD CONSTRAINT refund_transactions_amount_check 
-CHECK (amount_usd > 0 AND amount_usd <= 10000);
+ADD CONSTRAINT refund_transactions_max_amount_check 
+CHECK (amount <= 10000);
 
 -- ============================================================================
 -- 4. Create function to validate USD-only payments
@@ -101,8 +100,8 @@ COMMENT ON CONSTRAINT applications_payment_amount_check ON applications IS
 COMMENT ON CONSTRAINT webhook_logs_currency_check ON webhook_logs IS 
 'Enforces USD-only currency in webhook payloads';
 
-COMMENT ON CONSTRAINT refund_transactions_currency_check ON refund_transactions IS 
-'Enforces USD-only currency for refunds';
+COMMENT ON CONSTRAINT refund_transactions_max_amount_check ON refund_transactions IS 
+'Enforces maximum refund amount of $10,000 USD';
 
 COMMENT ON FUNCTION validate_usd_only_payment() IS 
 'Validates that all payments are in USD and amounts are correct';
