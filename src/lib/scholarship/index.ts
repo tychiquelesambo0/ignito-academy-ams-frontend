@@ -16,3 +16,14 @@ export {
   MAX_AGE_ON_SEPTEMBER_1ST,
   MIN_GRADUATION_YEAR,
 } from './eligibility'
+
+// Export video validation types and functions
+export type { VideoPlatform, VideoURLResult } from './video-validation'
+export {
+  validateVideoURL,
+  videoURLSchema,
+  isYouTubeURL,
+  isVimeoURL,
+  extractVideoId,
+  getEmbedURL,
+} from './video-validation'
