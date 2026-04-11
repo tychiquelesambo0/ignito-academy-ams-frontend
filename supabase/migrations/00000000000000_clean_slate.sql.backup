@@ -1,0 +1,84 @@
+-- ============================================================================
+-- CLEAN SLATE MIGRATION (OPTIONAL)
+-- ============================================================================
+-- Migration: 00000000000000_clean_slate.sql
+-- Created: 2026-04-10
+-- Description: Drops ALL existing tables to start fresh
+--
+-- ⚠️  WARNING: This is DESTRUCTIVE and will DELETE ALL DATA
+-- ⚠️  Only run this if you're using an existing Supabase project
+-- ⚠️  If you created a BRAND NEW project, you DON'T need this
+-- ============================================================================
+
+-- SAFETY CHECK: Uncomment the line below ONLY if you're absolutely sure
+-- SET client_min_messages TO WARNING;
+
+-- ============================================================================
+-- DROP ALL EXISTING TABLES (from legacy projects)
+-- ============================================================================
+
+-- Drop tables if they exist (in reverse dependency order)
+DROP TABLE IF EXISTS refund_transactions CASCADE;
+DROP TABLE IF EXISTS audit_trail CASCADE;
+DROP TABLE IF EXISTS uploaded_documents CASCADE;
+DROP TABLE IF EXISTS email_logs CASCADE;
+DROP TABLE IF EXISTS webhook_logs CASCADE;
+DROP TABLE IF EXISTS applications CASCADE;
+DROP TABLE IF EXISTS applicant_id_sequences CASCADE;
+DROP TABLE IF EXISTS applicants CASCADE;
+DROP TABLE IF EXISTS admissions_officers CASCADE;
+
+-- Drop any other legacy tables you might have
+-- Add more DROP statements here if you know of other tables
+
+-- ============================================================================
+-- DROP ALL EXISTING TYPES
+-- ============================================================================
+
+DROP TYPE IF EXISTS application_status CASCADE;
+DROP TYPE IF EXISTS payment_status CASCADE;
+DROP TYPE IF EXISTS exam_status CASCADE;
+DROP TYPE IF EXISTS scholarship_status CASCADE;
+
+-- ============================================================================
+-- DROP ALL EXISTING FUNCTIONS
+-- ============================================================================
+
+DROP FUNCTION IF EXISTS generate_applicant_id(INTEGER) CASCADE;
+DROP FUNCTION IF EXISTS update_application_status_with_version_check(VARCHAR, application_status, INTEGER) CASCADE;
+DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
+
+-- ============================================================================
+-- DROP ALL EXISTING STORAGE BUCKETS
+-- ============================================================================
+
+-- Note: This requires service_role access
+-- Run this in Supabase SQL Editor with service_role privileges
+
+DELETE FROM storage.objects WHERE bucket_id IN ('pieces_justificatives', 'official_letters', 'documents');
+DELETE FROM storage.buckets WHERE id IN ('pieces_justificatives', 'official_letters', 'documents');
+
+-- ============================================================================
+-- VERIFICATION
+-- ============================================================================
+
+DO $$
+DECLARE
+  v_table_count INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO v_table_count
+  FROM pg_tables
+  WHERE schemaname = 'public';
+  
+  IF v_table_count = 0 THEN
+    RAISE NOTICE '✅ Database is now CLEAN - No tables in public schema';
+  ELSE
+    RAISE NOTICE '⚠️  Warning: % tables still exist in public schema', v_table_count;
+  END IF;
+END $$;
+
+-- ============================================================================
+-- CLEAN SLATE COMPLETE
+-- ============================================================================
+
+COMMENT ON SCHEMA public IS 'Clean slate - ready for fresh migrations';

@@ -1,0 +1,142 @@
+{
+  "landing": {
+    "nav": {
+      "apply": "Postuler",
+      "login": "Ma Candidature",
+      "admissions": "Admissions",
+      "blog": "Blog"
+    },
+    "hero": {
+      "title": "Obtenez une Licence Britannique depuis la RDC",
+      "subtitle": "Le cursus complet en 4 ans, 100% à distance. Débutez dès l'obtention de votre Diplôme d'État avec notre année préparatoire, et décrochez votre Licence Britannique sans frais de voyage ni visa.",
+      "cta_primary": "Postuler Maintenant",
+      "cta_secondary": "En Savoir Plus",
+      "badge": "Excellence Britannique — Cadre RQF"
+    },
+    "stats": {
+      "years": "4 Années",
+      "years_desc": "Parcours Complet",
+      "uk": "UK",
+      "uk_desc": "Excellence Britannique",
+      "distance": "100%",
+      "distance_desc": "Enseignement à Distance",
+      "drc": "RDC",
+      "drc_desc": "Accès National"
+    },
+    "journey": {
+      "title": "Votre Parcours de 4 Ans",
+      "subtitle": "Complétez l'intégralité de votre Licence Britannique sans quitter la RDC.",
+      "subtitle2": "De l'Examen d'État à une Licence Britannique — Parcours structuré et aligné sur le cadre RQF",
+      "year0": "Année 1",
+      "year0_title": "Diplôme de Foundation",
+      "year0_location": "RDC / En Ligne",
+      "year1": "Année 2",
+      "year1_title": "Niveau Certificate",
+      "year1_location": "RDC / En Ligne",
+      "year2": "Année 3",
+      "year2_title": "Niveau Diploma",
+      "year2_location": "RDC / En Ligne",
+      "year3": "Année 4",
+      "year3_title": "Licence (Bachelor's Degree)",
+      "year3_location": "RDC / En Ligne",
+      "year3_badge": "ANNÉE FINALE"
+    },
+    "foundation": {
+      "badge": "Qualification de Niveau 3 (L3IFDHES)",
+      "title": "L'Année Préparatoire",
+      "subtitle": "Votre passerelle vers l'enseignement supérieur britannique — maîtrisez l'anglais académique et les méthodologies universitaires en une seule année.",
+      "benefit1_title": "Aucun Test IELTS Requis",
+      "benefit1_desc": "Pas de certifications externes. Notre cursus intègre une formation rigoureuse en anglais académique, vous préparant exactement pour l'université britannique.",
+      "benefit2_title": "Progression Directe Garantie",
+      "benefit2_desc": "En validant cette année préparatoire, vous sécurisez automatiquement votre passage en Année 1 de Licence (Niveau 4) — sans candidature incertaine.",
+      "benefit3_title": "Tremplin vers la Licence",
+      "benefit3_desc": "L'Année Préparatoire s'intègre dans notre cursus continu de 4 ans. Validez cette étape et progressez naturellement jusqu'à votre Licence britannique."
+    },
+    "curriculum": {
+      "title": "Programme de l'Année Préparatoire",
+      "subtitle": "Découvrez les six modules fondamentaux de votre première année. Un cursus rigoureux conçu pour vous mettre au niveau des meilleures universités britanniques.",
+      "subject1": "Anglais Académique Avancé",
+      "subject2": "Méthodologie Universitaire",
+      "subject3": "Maîtrise des Outils Numériques",
+      "subject4": "Mathématiques Appliquées aux Affaires",
+      "subject5": "Fondamentaux du Commerce et de l'Entreprise",
+      "subject6": "Développement Personnel et Leadership",
+      "details_title": "Détails de l'Année Préparatoire",
+      "duration_label": "Rentrée Académique",
+      "duration_value": "Septembre 2026",
+      "mode_label": "Format",
+      "mode_value": "100% en Ligne + Tutorat Local",
+      "requirement_label": "Conditions d'Admission",
+      "requirement_value": "Diplôme d'État (Min. 50%)",
+      "download_cta": "Télécharger le Programme Complet (PDF)"
+    },
+    "pathway_detail": {
+      "title": "Le Diplôme Britannique Vient à Vous",
+      "subtitle": "Étudiez Intelligemment. Économisez. Obtenez un Diplôme Britannique — Depuis la RDC.",
+      "description": "Complétez les 4 années de votre diplôme britannique en RDC grâce à notre modèle innovant en ligne + hub — vous permettant d'économiser plus de 142 000 $ en frais de scolarité, coûts de vie et dépenses de voyage.",
+      "timeline_title": "Le Parcours de 4 Ans",
+      "year0_title": "Diplôme de Foundation",
+      "year0_location": "RDC / En Ligne",
+      "year0_desc": "Développez votre anglais académique et vos compétences d'étude avec notre Hub RDC et un accès complet en ligne aux ressources britanniques.",
+      "year1_title": "Niveau Certificate",
+      "year1_location": "RDC / En Ligne",
+      "year1_desc": "Commencez votre programme britannique. Étudiez en ligne avec un soutien hebdomadaire en personne à notre Hub RDC.",
+      "year2_title": "Niveau Diploma",
+      "year2_location": "RDC / En Ligne",
+      "year2_desc": "Poursuivez vos études depuis chez vous. Accédez à des cours en direct, du contenu enregistré et des conseillers académiques locaux.",
+      "year3_title": "Licence (Bachelor's Degree)",
+      "year3_location": "RDC / En Ligne",
+      "year3_desc": "Complétez votre dernière année entièrement en ligne selon les standards universitaires britanniques. Obtenez votre diplôme britannique sans quitter la RDC.",
+      "year3_badge": "ANNÉE FINALE"
+    },
+    "scholarship": {
+      "badge": "Cohorte Inaugurale — Offre Exclusive",
+      "title": "La Bourse d'Excellence",
+      "subtitle": "Jusqu'à 20 bourses d'études intégrales pour notre cohorte inaugurale.",
+      "description": "Nous couvrons 100% de vos frais de scolarité et votre forfait internet pour les 4 ans. Réservé aux esprits les plus brillants de la RDC ayant une moyenne supérieure à 70%.",
+      "criteria_title": "Critères d'Éligibilité",
+      "criteria_1": "Moyenne générale ≥ 70% sur les 3 années",
+      "criteria_2": "Âge inférieur à 25 ans à la date de candidature",
+      "criteria_3": "Diplôme d'État obtenu en 2024, 2025 ou 2026",
+      "cta": "Vérifier mon Éligibilité",
+      "note": "Créez votre profil sur Admitta pour vérifier votre éligibilité. Frais de dossier exceptionnellement offerts pour notre Cohorte Inaugurale.",
+      "covers_tuition": "100% des Frais de Scolarité",
+      "covers_tuition_desc": "4 années couvertes intégralement",
+      "covers_internet": "Forfait Internet",
+      "covers_internet_desc": "Connectivité assurée pendant 4 ans",
+      "covers_slots": "20 Bourses",
+      "covers_slots_desc": "Places limitées — Cohorte inaugurale"
+    },
+    "why_choose": {
+      "title": "Pourquoi Choisir Ignito Academy ?",
+      "subtitle": "Une éducation de classe mondiale alliée à une accessibilité locale",
+      "benefit1_title": "Excellence Britannique",
+      "benefit1_desc": "Parcours structuré et aligné sur le cadre officiel RQF pour des standards universitaires d'excellence.",
+      "benefit2_title": "100% à Distance",
+      "benefit2_desc": "Étudiez de chez vous avec un soutien complet et des ressources en ligne.",
+      "benefit3_title": "Horaire Flexible",
+      "benefit3_desc": "Progressez à votre rythme en conciliant études et engagements personnels.",
+      "benefit4_title": "Soutien Local",
+      "benefit4_desc": "Une équipe d'encadrement académique local dédiée, présente partout en RDC."
+    },
+    "final_cta": {
+      "title": "Votre Licence Britannique Commence Ici",
+      "subtitle": "Les inscriptions pour la cohorte de Septembre 2026 sont ouvertes. Soumettez votre dossier dès aujourd'hui et sécurisez votre place.",
+      "cta": "Postuler Maintenant",
+      "note": "Frais de dossier exceptionnellement offerts pour notre Cohorte Inaugurale. Prenez 2 minutes pour créer votre profil."
+    },
+    "footer": {
+      "description": "Centre d'enseignement à distance proposant des parcours de licences britanniques alignés sur le cadre RQF, accessibles depuis la RDC.",
+      "quick_links": "Liens Rapides",
+      "admissions": "Admissions",
+      "blog": "Blog",
+      "apply": "Postuler Maintenant",
+      "track": "Suivre ma Candidature",
+      "contact": "Nous Contacter",
+      "address": "Avenue Kwango, Immeuble 130B, 5ème étage, Gombe",
+      "phone": "+243 824 401 073",
+      "email": "admin@ignitoacademy.com",
+      "copyright": "© 2026 Ignito Academy. Tous droits réservés."
+    }
+  }
+}

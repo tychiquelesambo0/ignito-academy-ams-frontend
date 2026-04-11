@@ -1,0 +1,142 @@
+{
+  "landing": {
+    "nav": {
+      "apply": "Apply Now",
+      "login": "My Application",
+      "admissions": "Admissions",
+      "blog": "Blog"
+    },
+    "hero": {
+      "title": "Earn a British Bachelor's Degree from the DRC",
+      "subtitle": "The complete 4-year academic pathway, delivered 100% via distance learning. Commence your foundation year immediately upon receiving your Diplôme d'État, and graduate with a UK Bachelor's degree without the burden of travel or visa costs.",
+      "cta_primary": "Apply Now",
+      "cta_secondary": "My Application",
+      "badge": "British Excellence — RQF Framework"
+    },
+    "stats": {
+      "years": "4 Years",
+      "years_desc": "Complete Pathway",
+      "uk": "UK",
+      "uk_desc": "British Excellence",
+      "distance": "100%",
+      "distance_desc": "Distance Learning",
+      "drc": "DRC",
+      "drc_desc": "Nationwide Access"
+    },
+    "journey": {
+      "title": "Your 4-Year Academic Pathway",
+      "subtitle": "Complete your entire British Bachelor's Degree without leaving the DRC.",
+      "subtitle2": "From the Examen d'État to a British Degree — A structured pathway aligned with the RQF framework.",
+      "year0": "Year 1",
+      "year0_title": "Level 3 Foundation",
+      "year0_location": "DRC / Online",
+      "year1": "Year 2",
+      "year1_title": "Level 4 Certificate",
+      "year1_location": "DRC / Online",
+      "year2": "Year 3",
+      "year2_title": "Level 5 Diploma",
+      "year2_location": "DRC / Online",
+      "year3": "Year 4",
+      "year3_title": "Level 6 Bachelor's Degree",
+      "year3_location": "DRC / Online",
+      "year3_badge": "FINAL YEAR"
+    },
+    "foundation": {
+      "badge": "Level 3 Qualification (L3IFDHES)",
+      "title": "The International Foundation Year",
+      "subtitle": "Your gateway to British higher education — master academic English and university-level study methodologies in a single academic year.",
+      "benefit1_title": "No External IELTS Required",
+      "benefit1_desc": "Bypass costly external language tests. Our curriculum embeds rigorous academic English training, precisely equipping you for UK university standards.",
+      "benefit2_title": "Guaranteed Academic Progression",
+      "benefit2_desc": "Upon successful completion of this foundation year, you automatically secure your progression to Year 1 of the Bachelor's programme (Level 4) — eliminating application uncertainty.",
+      "benefit3_title": "The Launchpad to Your Degree",
+      "benefit3_desc": "The Foundation Year is seamlessly integrated into our continuous 4-year pathway. Validate this initial stage and progress naturally to your final British Bachelor's degree."
+    },
+    "curriculum": {
+      "title": "Foundation Year Syllabus",
+      "subtitle": "Explore the six core modules of your first year. A rigorous curriculum designed to elevate your academic competencies to the standards of top UK universities.",
+      "subject1": "Advanced Academic English",
+      "subject2": "University Study Skills",
+      "subject3": "Digital Literacy & IT Skills",
+      "subject4": "Applied Mathematics for Business",
+      "subject5": "Fundamentals of Business",
+      "subject6": "Personal Development & Leadership",
+      "details_title": "Foundation Year Specifications",
+      "duration_label": "Next Intake",
+      "duration_value": "September 2026",
+      "mode_label": "Study Mode",
+      "mode_value": "100% Online + Local Tutoring Support",
+      "requirement_label": "Entry Requirement",
+      "requirement_value": "Examen d'État (Min. 50%)",
+      "download_cta": "Download Full Syllabus (PDF)"
+    },
+    "pathway_detail": {
+      "title": "The British Degree Delivered to You",
+      "subtitle": "Study Intelligently. Optimise Your Investment. Earn a British Degree — From the DRC.",
+      "description": "Complete the entirety of your UK degree in the DRC through our innovative distance learning model — saving you over $142,000 in tuition, living costs, and travel expenses.",
+      "timeline_title": "The 4-Year Academic Journey",
+      "year0_title": "Foundation Diploma",
+      "year0_location": "DRC / Online",
+      "year0_desc": "Build your academic English and study skills with our DRC Hub and full online access to UK materials.",
+      "year1_title": "Certificate Level",
+      "year1_location": "DRC / Online",
+      "year1_desc": "Begin your UK programme. Study online with weekly in-person support at our DRC Hub.",
+      "year2_title": "Diploma Level",
+      "year2_location": "DRC / Online",
+      "year2_desc": "Continue your studies from home. Access live lectures, recorded content, and local academic advisors.",
+      "year3_title": "Bachelor's Degree",
+      "year3_location": "DRC / Online",
+      "year3_desc": "Complete your final year fully online to UK university standards. Graduate with an authentic British degree without leaving the DRC.",
+      "year3_badge": "FINAL YEAR"
+    },
+    "scholarship": {
+      "badge": "Inaugural Cohort — Exclusive Offer",
+      "title": "The Excellence Scholarship",
+      "subtitle": "Up to 20 full-ride scholarships for our inaugural cohort.",
+      "description": "We cover 100% of your tuition fees and your internet data for all 4 years. Reserved for the brightest minds in the DRC with an average above 70%.",
+      "criteria_title": "Eligibility Criteria",
+      "criteria_1": "Overall average ≥ 70% across 3 academic years",
+      "criteria_2": "Under 25 years of age at the time of application",
+      "criteria_3": "Examen d'État completed in 2024, 2025, or 2026",
+      "cta": "Check My Eligibility",
+      "note": "Create your profile on Admitta to verify your eligibility. Application fees are exceptionally waived for our Inaugural Cohort.",
+      "covers_tuition": "100% Tuition Fees",
+      "covers_tuition_desc": "All 4 years fully covered",
+      "covers_internet": "Internet Data Package",
+      "covers_internet_desc": "Connectivity guaranteed for 4 years",
+      "covers_slots": "20 Scholarships",
+      "covers_slots_desc": "Limited places — Inaugural cohort"
+    },
+    "why_choose": {
+      "title": "Why Choose Ignito Academy?",
+      "subtitle": "World-class UK education seamlessly integrated with local accessibility.",
+      "benefit1_title": "British Excellence",
+      "benefit1_desc": "A structured pathway aligned with the official RQF framework, ensuring world-class academic standards.",
+      "benefit2_title": "100% Distance Learning",
+      "benefit2_desc": "Complete your studies from your home country with comprehensive online resources and academic support.",
+      "benefit3_title": "Flexible Scheduling",
+      "benefit3_desc": "Advance at your own pace, allowing you to successfully balance rigorous academic pursuits with personal commitments.",
+      "benefit4_title": "Dedicated Local Support",
+      "benefit4_desc": "Benefit from our localised academic facilitation team, providing on-the-ground guidance throughout the DRC."
+    },
+    "final_cta": {
+      "title": "Your British Degree Commences Here",
+      "subtitle": "Applications for the September 2026 academic intake are now officially open. Submit your portfolio today to secure your enrolment.",
+      "cta": "Apply Now",
+      "note": "Application fees are exceptionally waived for our Inaugural Cohort. Create your profile in just two minutes."
+    },
+    "footer": {
+      "description": "A distance learning centre offering British degree pathways aligned with the RQF framework, accessible from the Democratic Republic of Congo.",
+      "quick_links": "Quick Links",
+      "admissions": "Admissions",
+      "blog": "Blog",
+      "apply": "Apply Now",
+      "track": "Track Application",
+      "contact": "Contact Us",
+      "address": "Kwango Avenue, Building 130B, 5th floor, Gombe",
+      "phone": "+243 824 401 073",
+      "email": "admin@ignitoacademy.com",
+      "copyright": "© 2026 Ignito Academy. All rights reserved."
+    }
+  }
+}

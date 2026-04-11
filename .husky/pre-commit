@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# OTHM Keyword Scanner
+# This hook scans all staged files for the prohibited "OTHM" keyword
+# and blocks the commit if found.
+
+echo "🔍 Scanning for prohibited OTHM keyword..."
+
+# Get all staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [ -z "$STAGED_FILES" ]; then
+  echo "✅ No files to check"
+  exit 0
+fi
+
+# Search for OTHM keyword (case-insensitive)
+OTHM_FOUND=$(echo "$STAGED_FILES" | xargs grep -i "OTHM" 2>/dev/null)
+
+if [ -n "$OTHM_FOUND" ]; then
+  echo "❌ ERROR: OTHM keyword detected in staged files!"
+  echo ""
+  echo "$OTHM_FOUND"
+  echo ""
+  echo "The keyword 'OTHM' is strictly prohibited for IP protection."
+  echo "Please use 'UK Level 3 Foundation Diploma' instead."
+  echo ""
+  exit 1
+fi
+
+echo "✅ No OTHM keyword found"
+
+# Run ESLint
+echo "🔍 Running ESLint..."
+npm run lint
+
+exit 0

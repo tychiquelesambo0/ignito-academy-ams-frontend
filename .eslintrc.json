@@ -1,0 +1,20 @@
+{
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "Literal[value=/OTHM/i]",
+        "message": "OTHM keyword is strictly prohibited. Use 'UK Level 3 Foundation Diploma' instead."
+      },
+      {
+        "selector": "TemplateElement[value.raw=/OTHM/i]",
+        "message": "OTHM keyword is strictly prohibited. Use 'UK Level 3 Foundation Diploma' instead."
+      },
+      {
+        "selector": "Identifier[name=/OTHM/i]",
+        "message": "OTHM keyword is strictly prohibited in variable/function names. Use alternative naming."
+      }
+    ]
+  }
+}
