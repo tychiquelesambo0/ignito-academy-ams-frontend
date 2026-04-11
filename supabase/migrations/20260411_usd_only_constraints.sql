@@ -9,15 +9,13 @@
 -- 1. Add CHECK constraint to applications table
 -- ============================================================================
 
--- Ensure payment_amount is exactly 29 USD (application fee)
+-- Ensure payment_amount_paid is exactly 29 USD (application fee) when not NULL
 ALTER TABLE applications
 ADD CONSTRAINT applications_payment_amount_check 
-CHECK (payment_amount = 29);
+CHECK (payment_amount_paid IS NULL OR payment_amount_paid = 29);
 
--- Ensure currency is always USD
-ALTER TABLE applications
-ADD CONSTRAINT applications_currency_check 
-CHECK (currency = 'USD');
+-- Ensure payment_currency is always USD (already has constraint, but adding for clarity)
+-- Note: The table already has chk_payment_currency, so we skip adding duplicate
 
 -- ============================================================================
 -- 2. Add CHECK constraint to webhook_logs table
@@ -52,14 +50,19 @@ CHECK (amount_usd > 0 AND amount_usd <= 10000);
 CREATE OR REPLACE FUNCTION validate_usd_only_payment()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Check currency is USD
-  IF NEW.currency != 'USD' THEN
+  -- Check currency is USD for applications
+  IF TG_TABLE_NAME = 'applications' AND NEW.payment_currency != 'USD' THEN
+    RAISE EXCEPTION 'Invalid currency: %. Only USD is supported.', NEW.payment_currency;
+  END IF;
+  
+  -- Check currency is USD for refund_transactions
+  IF TG_TABLE_NAME = 'refund_transactions' AND NEW.currency != 'USD' THEN
     RAISE EXCEPTION 'Invalid currency: %. Only USD is supported.', NEW.currency;
   END IF;
   
-  -- Check amount is exactly 29 USD for applications
-  IF TG_TABLE_NAME = 'applications' AND NEW.payment_amount != 29 THEN
-    RAISE EXCEPTION 'Invalid payment amount: $%. Application fee must be exactly $29 USD.', NEW.payment_amount;
+  -- Check amount is exactly 29 USD for applications (when not NULL)
+  IF TG_TABLE_NAME = 'applications' AND NEW.payment_amount_paid IS NOT NULL AND NEW.payment_amount_paid != 29 THEN
+    RAISE EXCEPTION 'Invalid payment amount: $%. Application fee must be exactly $29 USD.', NEW.payment_amount_paid;
   END IF;
   
   RETURN NEW;
@@ -93,10 +96,7 @@ CREATE TRIGGER refund_transactions_usd_only_trigger
 -- ============================================================================
 
 COMMENT ON CONSTRAINT applications_payment_amount_check ON applications IS 
-'Enforces application fee of exactly $29 USD';
-
-COMMENT ON CONSTRAINT applications_currency_check ON applications IS 
-'Enforces USD-only currency. No CDF or other currencies allowed.';
+'Enforces application fee of exactly $29 USD when payment_amount_paid is not NULL';
 
 COMMENT ON CONSTRAINT webhook_logs_currency_check ON webhook_logs IS 
 'Enforces USD-only currency in webhook payloads';
