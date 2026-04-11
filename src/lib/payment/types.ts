@@ -7,6 +7,9 @@
  * - NO currency conversion
  */
 
+import type { Currency } from './currency'
+import { APPLICATION_FEE_USD } from './currency'
+
 // ============================================================================
 // PAYMENT TYPES
 // ============================================================================
@@ -39,6 +42,9 @@ export interface PaymentRequest {
   
   /** Amount in USD (CRITICAL: USD ONLY) */
   amountUsd: number
+  
+  /** Currency (MUST be 'USD') */
+  currency: Currency
   
   /** Phone number in E.164 format (+243XXXXXXXXX) */
   phoneNumber: string
