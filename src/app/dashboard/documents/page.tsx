@@ -10,6 +10,8 @@
  * Submit: sets applications.documents_submitted = true → unlocks Payment step.
  * Lock: documents become read-only once payment_status is Confirmed or Waived,
  *       unless « Admission sous réserve » or conditional_message (demande complémentaire).
+ * Après dépôt des pièces demandées : bouton « Confirmer l'envoi… » appelle
+ * /api/documents/confirm-supplementary-submission (efface conditional_message).
  *
  * Accepted formats: PDF, JPG, PNG — max 5 MB per file (enforced client + server + DB).
  * NO video uploads (architecture pillar).
@@ -392,6 +394,9 @@ function DocumentsForm() {
   const [slots,        setSlots]        = useState<Record<string, UploadedDoc | null>>({})
   const [submitting,   setSubmitting]   = useState(false)
   const [submitError,  setSubmitError]  = useState<string | null>(null)
+  const [supplementarySubmitting, setSupplementarySubmitting] = useState(false)
+  const [supplementaryError,      setSupplementaryError]      = useState<string | null>(null)
+  const [supplementarySuccess,      setSupplementarySuccess]    = useState<string | null>(null)
 
   const applicantId      = application?.applicant_id ?? ''
   const alreadySubmitted = application?.documents_submitted === true
@@ -403,11 +408,12 @@ function DocumentsForm() {
       )
     : true
 
+  // Bannière complémentaire : uniquement lorsqu'un message admissions est actif
+  // (après confirmation candidat, le message est effacé → disparaît de tout le tableau de bord).
   const supplementWindow =
     !!application &&
     !isLocked &&
-    (Boolean(application.conditional_message?.trim()) ||
-      application.application_status === 'Admission sous réserve')
+    Boolean(application.conditional_message?.trim())
 
   const requiredTypes    = REQUIRED_DOCS.map((d) => d.type)
   const requiredUploaded = requiredTypes.filter((t) => slots[t] != null).length
@@ -465,6 +471,34 @@ function DocumentsForm() {
   }
 
   // ── Submit documents ──────────────────────────────────────────────────────
+
+  const handleConfirmSupplementary = async () => {
+    if (!application?.conditional_message?.trim()) return
+    setSupplementarySubmitting(true)
+    setSupplementaryError(null)
+    setSupplementarySuccess(null)
+    try {
+      const res  = await fetch('/api/documents/confirm-supplementary-submission', {
+        method: 'POST',
+      })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok || !body.success) {
+        setSupplementaryError(
+          typeof body.error === 'string' ? body.error : 'La confirmation n\'a pas abouti.',
+        )
+        return
+      }
+      await refetch()
+      await loadDocuments()
+      setSupplementarySuccess(
+        'Confirmation enregistrée. Les avis sur votre tableau de bord sont levés ; le Bureau des admissions peut consulter vos fichiers.',
+      )
+    } catch {
+      setSupplementaryError('Erreur réseau. Veuillez réessayer.')
+    } finally {
+      setSupplementarySubmitting(false)
+    }
+  }
 
   const handleSubmit = async () => {
     if (!canSubmit) return
@@ -653,7 +687,7 @@ function DocumentsForm() {
             </div>
           </div>
         ) : alreadySubmitted && supplementWindow ? (
-          <div className="rounded-lg border border-[#4EA6F5]/25 bg-[#F8FAFC] p-5">
+          <div className="space-y-4 rounded-lg border border-[#4EA6F5]/25 bg-[#F8FAFC] p-5">
             <div className="flex items-start gap-3">
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#4EA6F5]" />
               <div>
@@ -662,11 +696,49 @@ function DocumentsForm() {
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-slate-600">
                   Votre dossier principal est déjà transmis. Téléversez les fichiers demandés dans
-                  les sections ci-dessus ; le comité pourra les consulter lors de la prochaine
-                  vérification.
+                  les sections ci-dessus ; ils sont enregistrés immédiatement et sont visibles par
+                  le Bureau des admissions. Lorsque vous avez terminé, confirmez ci-dessous afin
+                  de lever les avis sur votre tableau de bord.
                 </p>
               </div>
             </div>
+            {supplementaryError && (
+              <div className="flex items-center gap-2 rounded-md border border-[#EF4444]/25 bg-[#EF4444]/5 px-3 py-2">
+                <AlertCircle className="h-4 w-4 shrink-0 text-[#EF4444]" />
+                <p className="text-xs text-[#EF4444]">{supplementaryError}</p>
+              </div>
+            )}
+            {supplementarySuccess && (
+              <div className="flex items-center gap-2 rounded-md border border-[#10B981]/25 bg-[#10B981]/5 px-3 py-2">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-[#10B981]" />
+                <p className="text-xs text-emerald-800">{supplementarySuccess}</p>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleConfirmSupplementary}
+              disabled={supplementarySubmitting}
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-md
+                         bg-[#10B981] text-sm font-semibold text-white transition-colors
+                         hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4EA6F5]"
+            >
+              {supplementarySubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Enregistrement…
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="h-4 w-4" />
+                  Confirmer l&apos;envoi des pièces complémentaires au Bureau des admissions
+                </>
+              )}
+            </button>
+            <p className="text-[11px] leading-relaxed text-slate-500">
+              Cette confirmation indique que vous avez terminé le dépôt demandé. Vous pourrez
+              encore recevoir une nouvelle demande si le comité en a besoin.
+            </p>
           </div>
         ) : alreadySubmitted ? (
           /* Already submitted — show next-step CTA */
