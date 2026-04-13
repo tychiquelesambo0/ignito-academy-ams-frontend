@@ -288,9 +288,13 @@ function RejectedView() {
 export default function ScholarshipPage() {
   const { application, refetch } = useApplication()
 
-  const [videoUrl, setVideoUrl]   = useState('')
-  const [saving, setSaving]       = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
+  const [videoUrl, setVideoUrl]     = useState('')
+  const [saving, setSaving]         = useState(false)
+  const [saveError, setSaveError]   = useState<string | null>(null)
+  // Local submitted flag — set immediately after a successful DB write so the
+  // success view appears without waiting for context refetch propagation.
+  const [justSubmitted, setJustSubmitted] = useState(false)
+  const [submittedUrl, setSubmittedUrl]   = useState<string | null>(null)
 
   // Pre-fill input from any previously saved (but not yet locked) value
   useEffect(() => {
@@ -335,8 +339,11 @@ export default function ScholarshipPage() {
   )
 
   // ── SUBMITTED — video saved → locked, no editing ──────────────────────────
-  if (application.scholarship_video_url) return (
-    <div className="space-y-8">
+  // Priority: local justSubmitted flag (immediate) OR DB value (on reload).
+  const savedVideoUrl = justSubmitted ? submittedUrl : application.scholarship_video_url
+
+  if (savedVideoUrl) return (
+    <div className="space-y-8 animate-in fade-in duration-300">
       <PageHeader />
 
       {/* Eligibility badge */}
@@ -348,14 +355,27 @@ export default function ScholarshipPage() {
         </span>
       </div>
 
-      <SubmittedView videoUrl={application.scholarship_video_url} />
+      <SubmittedView videoUrl={savedVideoUrl} />
+
+      {/* Dashboard CTA — always visible after submission */}
+      <div className="flex justify-center pt-2">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 h-11 px-6 rounded-md
+                     bg-[#031463] text-sm font-semibold text-white
+                     transition-colors hover:bg-[#031463]/90"
+        >
+          Retour au tableau de bord
+          <ChevronRight className="h-4 w-4" />
+        </Link>
+      </div>
     </div>
   )
 
   // ── FORM — eligible, no video submitted yet ────────────────────────────────
 
-  const embedUrl   = toEmbedUrl(videoUrl)
-  const urlIsValid = isValidVideoUrl(videoUrl)
+  const embedUrl    = toEmbedUrl(videoUrl)
+  const urlIsValid  = isValidVideoUrl(videoUrl)
   const showPreview = urlIsValid && !!embedUrl
 
   const handleSave = async () => {
@@ -368,14 +388,24 @@ export default function ScholarshipPage() {
     try {
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
-      const { error } = await supabase
+
+      const { data: saved, error } = await supabase
         .from('applications')
         .update({ scholarship_video_url: videoUrl.trim() })
         .eq('id', application.id)
+        .select('scholarship_video_url')
+        .single()
+
       if (error) throw new Error(error.message)
-      await refetch()
-      // After refetch the application.scholarship_video_url is set →
-      // the component re-renders into the SUBMITTED branch above.
+      if (!saved) throw new Error('La mise à jour n\'a pas été enregistrée. Veuillez réessayer.')
+
+      // Flip the local flag immediately — the UI transitions to SubmittedView
+      // without waiting for context propagation.
+      setSubmittedUrl(saved.scholarship_video_url ?? videoUrl.trim())
+      setJustSubmitted(true)
+
+      // Refresh context in the background so realtime + sidebar stay in sync.
+      refetch()
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde.')
     } finally {
