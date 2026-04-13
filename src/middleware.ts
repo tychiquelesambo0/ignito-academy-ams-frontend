@@ -130,6 +130,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    /*
+     * Match all routes EXCEPT:
+     *  - Next.js internals (_next/static, _next/image)
+     *  - Static assets (favicon, images)
+     *  - PawaPay callback endpoints — must never be wrapped in auth per PawaPay docs
+     */
+    '/((?!_next/static|_next/image|favicon.ico|api/webhooks|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
