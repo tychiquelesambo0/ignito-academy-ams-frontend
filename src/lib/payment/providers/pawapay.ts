@@ -291,6 +291,7 @@ export class PawaPayProvider implements IPaymentProvider {
       case 'COMPLETED':
         return 'Confirmed'
       case 'ACCEPTED':
+      case 'SUBMITTED': // intermediate state: forwarded to MMO, awaiting PIN
         return 'Pending'
       case 'FAILED':
       case 'REJECTED':
