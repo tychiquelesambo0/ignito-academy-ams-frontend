@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration: 20260413_documents_before_payment.sql
+-- Migration: 20260413101002_documents_before_payment.sql
 -- Re-order the applicant journey: Documents → Payment (not Payment → Documents)
 -- ============================================================================
 

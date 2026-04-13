@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration: 20260413_fix_storage_upload_policy.sql
+-- Migration: 20260413101004_fix_storage_upload_policy.sql
 -- Allow document uploads BEFORE payment confirmation.
 -- The old INSERT policy required payment_status IN ('Confirmed', 'Waived'),
 -- which contradicts our new flow: Documents → Payment.

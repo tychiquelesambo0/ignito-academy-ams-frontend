@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration: 20260413_fix_graduation_year_constraint.sql
+-- Migration: 20260413101003_fix_graduation_year_constraint.sql
 -- Remove the 2024 floor on graduation_year.
 -- The year-2024 threshold is a scholarship eligibility filter, not an
 -- application requirement.  Applicants who graduated before 2024 must

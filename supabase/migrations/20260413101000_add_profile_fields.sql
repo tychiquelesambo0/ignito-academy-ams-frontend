@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration: 20260413_add_profile_fields.sql
+-- Migration: 20260413101000_add_profile_fields.sql
 -- Add postnom (middle name), commune, and code_postal to applicants table
 -- ============================================================================
 

@@ -162,7 +162,7 @@ export default function ProfilePage() {
   // ── Save ───────────────────────────────────────────────────────────────────
   // Two separate UPDATE calls so address-column failures never block core saves.
   // Core fields (prenom, nom, phone, date) always exist in the live schema.
-  // Address fields require migration 20260413_add_profile_fields.sql.
+  // Address fields require migration 20260413101000_add_profile_fields.sql.
   const onSubmit = async (data: ProfileFormData) => {
     setSaving(true)
     setSaveSuccess(false)
