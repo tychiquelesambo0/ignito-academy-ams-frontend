@@ -281,12 +281,23 @@ export default function ApplicationDetailPage() {
 
     if (applicantData) setApplicant(applicantData as Applicant)
 
-    // Documents
-    const { data: docs } = await supabase
+    // Documents — application_id in DB is UUID (applications.id), NOT applicant_id string.
+    // Upload API sets both applicant_id + application_id; filter by either for robustness.
+    const applicationUuid = (appData as Record<string, unknown>).id as string | undefined
+    let docsQuery = supabase
       .from('uploaded_documents')
       .select('id, file_name, file_size_bytes, mime_type, uploaded_at, file_path, document_type')
-      .eq('application_id', appData.applicant_id)
       .order('uploaded_at', { ascending: true })
+
+    if (applicationUuid) {
+      docsQuery = docsQuery.or(
+        `applicant_id.eq.${appData.applicant_id},application_id.eq.${applicationUuid}`
+      )
+    } else {
+      docsQuery = docsQuery.eq('applicant_id', appData.applicant_id)
+    }
+
+    const { data: docs } = await docsQuery
 
     setDocuments((docs ?? []) as UploadedDoc[])
 
