@@ -45,8 +45,21 @@ const CEFR_LEVELS = [
   { value: 'C2', label: 'C2 — Maîtrise' },
 ] as const
 
+/** Returns the applicant's age in full years at the time of the call. */
+function calcAge(dateNaissance: string | null | undefined): number {
+  if (!dateNaissance) return 99 // unknown birth date → assume not eligible
+  const birth = new Date(dateNaissance)
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const monthDiff = today.getMonth() - birth.getMonth()
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--
+  }
+  return age
+}
+
 function AcademicHistoryForm() {
-  const { application, refetch } = useApplication()
+  const { applicant, application, refetch } = useApplication()
   const steps       = useApplicationSteps()
   const nextStep    = steps.find((s) => s.id === 'documents')
 
@@ -139,6 +152,31 @@ function AcademicHistoryForm() {
       } = await supabase.auth.getUser()
       if (!user) throw new Error('Non authentifié')
 
+      // Compute scholarship eligibility from the submitted grades + applicant age.
+      // Criteria (all must be true):
+      //   • grade_10, grade_11, grade_12 averages ≥ 70 %
+      //   • EXETAT percentage ≥ 70 %
+      //   • graduation year ≥ 2024
+      //   • applicant age < 20 years
+      const g10  = data.grade10Average  ?? 0
+      const g11  = data.grade11Average  ?? 0
+      const g12  = data.grade12Average  ?? 0
+      const exet = data.exetatPercentage ?? 0
+      const grad = data.graduationYear   ?? 0
+      const age  = calcAge(applicant?.date_naissance)
+
+      const isEligible =
+        g10  >= 70 &&
+        g11  >= 70 &&
+        g12  >= 70 &&
+        exet >= 70 &&
+        grad >= 2024 &&
+        age   < 20
+
+      console.log('[AcademicHistory] scholarship eligibility →', {
+        g10, g11, g12, exet, grad, age, isEligible,
+      })
+
       // updated_at is managed by the DB trigger — do not send it manually.
       // .select().single() lets us detect silent RLS failures (null data, no error).
       const { data: savedRow, error } = await supabase
@@ -152,9 +190,10 @@ function AcademicHistoryForm() {
           exetat_percentage:         data.exetatPercentage        ?? null,
           graduation_year:           data.graduationYear,
           english_proficiency_level: data.englishProficiencyLevel ?? null,
+          is_scholarship_eligible:   isEligible,
         })
         .eq('user_id', user.id)
-        .select('user_id, ecole_provenance, grade_10_average')
+        .select('user_id, ecole_provenance, grade_10_average, is_scholarship_eligible')
         .single()
 
       console.log('[AcademicHistory] update result →', { savedRow, error })
@@ -171,7 +210,8 @@ function AcademicHistoryForm() {
         )
       }
 
-      console.log('[AcademicHistory] confirmed saved school:', savedRow.ecole_provenance)
+      console.log('[AcademicHistory] confirmed saved school:', savedRow.ecole_provenance,
+        '| is_scholarship_eligible:', savedRow.is_scholarship_eligible)
 
       // Refresh context so step unlock and sidebar reflect saved grades
       await refetch()
