@@ -107,11 +107,32 @@ const PAY_LABELS: Record<string, string> = {
   Pending:   'En attente', Failed: 'Échoué',
 }
 
-const DOC_GROUPS = [
-  { key: 'id',   title: "Preuve d'Identité",           types: ["Preuve d'Identité"] },
-  { key: 'dip',  title: "Diplôme d'État ou Attestation", types: ["Diplôme d'État ou Attestation"] },
-  { key: 'bul',  title: 'Bulletins Scolaires',         types: ['Bulletin 10e', 'Bulletin 11e', 'Bulletin 12e'] },
-  { key: 'add',  title: 'Documents Additionnels',      types: ['Document Conditionnel', 'Autre'] },
+// Types MUST align with DB chk_document_type + /api/documents/upload + dashboard/documents.
+// Legacy strings kept so older rows still appear under the right heading.
+const DOC_GROUPS: { key: string; title: string; types: string[] }[] = [
+  {
+    key:   'id',
+    title: "Pièces d'identité",
+    types: ["Carte d'identité", "Photo d'identité", "Preuve d'Identité"],
+  },
+  {
+    key:   'dip',
+    title: "Diplôme d'État",
+    types: ["Diplôme d'État", "Diplôme d'État ou Attestation"],
+  },
+  {
+    key:   'bul',
+    title: 'Bulletins scolaires',
+    types: [
+      'Bulletin 10ème', 'Bulletin 11ème', 'Bulletin 12ème',
+      'Bulletin 10e', 'Bulletin 11e', 'Bulletin 12e',
+    ],
+  },
+  {
+    key:   'add',
+    title: 'Documents complémentaires',
+    types: ['Autre', 'Document Conditionnel', 'document_conditionnel'],
+  },
 ]
 
 function toEmbedUrl(url: string): string | null {
@@ -748,6 +769,54 @@ export default function ApplicationDetailPage() {
                 </div>
               )
             })}
+            {(() => {
+              const matchedIds = new Set(
+                documents.flatMap(d =>
+                  DOC_GROUPS.some(g => g.types.includes(d.document_type ?? '')) ? [d.id] : [],
+                ),
+              )
+              const orphanDocs = documents.filter(d => !matchedIds.has(d.id))
+              if (orphanDocs.length === 0) return null
+              return (
+                <div key="orphan">
+                  <h4 className="mb-2 text-sm font-semibold text-slate-700">
+                    Autres documents enregistrés
+                  </h4>
+                  <div className="space-y-2">
+                    {orphanDocs.map(doc => (
+                      <div key={doc.id}
+                           className="flex items-center justify-between rounded-lg
+                                      border border-slate-100 bg-slate-50 p-3">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <FileText className="h-4 w-4 shrink-0 text-slate-400" />
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-slate-800">{doc.file_name}</p>
+                            <p className="text-xs text-slate-400">
+                              {doc.document_type ?? 'Type inconnu'} ·{' '}
+                              {(doc.file_size_bytes / 1024).toFixed(0)} Ko ·{' '}
+                              {new Date(doc.uploaded_at).toLocaleDateString('fr-FR')}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleDownload(doc)}
+                          disabled={downloading === doc.id}
+                          className="flex items-center gap-1.5 rounded-md px-3 py-1.5
+                                     text-xs font-medium text-[#4EA6F5]
+                                     transition-colors hover:bg-blue-50 hover:text-[#021463]
+                                     disabled:opacity-50"
+                        >
+                          {downloading === doc.id
+                            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            : <Download className="h-3.5 w-3.5" />}
+                          Télécharger
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
           </div>
         )}
       </SectionCard>
