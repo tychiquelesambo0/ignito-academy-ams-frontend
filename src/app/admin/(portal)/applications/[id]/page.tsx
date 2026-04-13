@@ -255,10 +255,23 @@ export default function ApplicationDetailPage() {
         documents_submitted, user_id
       `)
       .eq('applicant_id', applicantId)
-      .single()
+      .maybeSingle()
 
-    if (appErr || !appData) {
-      setError('Dossier introuvable ou accès refusé.')
+    if (appErr) {
+      console.error('[detail] applications fetch error:', appErr)
+      setError(`Erreur lors du chargement : ${appErr.message} (code: ${appErr.code})`)
+      setLoading(false)
+      return
+    }
+
+    if (!appData) {
+      // applicant_id not found — try fetching via applicants list to confirm RLS works
+      const { data: allIds } = await supabase
+        .from('applications')
+        .select('applicant_id')
+        .limit(3)
+      console.warn('[detail] no row for applicant_id:', applicantId, '— sample IDs in DB:', allIds)
+      setError(`Dossier « ${applicantId} » introuvable. Identifiant incorrect ou aucun accès.`)
       setLoading(false)
       return
     }
@@ -430,11 +443,25 @@ export default function ApplicationDetailPage() {
 
   if (error || !application) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-24">
+      <div className="flex flex-col items-start gap-4 py-16 max-w-lg">
         <AlertCircle className="h-10 w-10 text-slate-300" />
-        <p className="text-sm text-slate-500">{error ?? 'Dossier introuvable.'}</p>
-        <Link href="/admin" className="text-xs text-[#4EA6F5] hover:underline">
-          ← Retour à la liste
+        <div>
+          <p className="text-sm font-semibold text-slate-700 mb-1">
+            Impossible de charger ce dossier
+          </p>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            {error ?? 'Dossier introuvable.'}
+          </p>
+          <p className="mt-2 text-xs font-mono text-slate-400">
+            ID recherché : {applicantId}
+          </p>
+        </div>
+        <Link
+          href="/admin"
+          className="inline-flex items-center gap-1.5 text-sm font-medium
+                     text-[#4EA6F5] transition-colors hover:text-[#021463]"
+        >
+          <ArrowLeft className="h-4 w-4" /> Retour à la liste
         </Link>
       </div>
     )
