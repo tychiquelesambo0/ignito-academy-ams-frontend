@@ -780,8 +780,8 @@ function SubmittedState({
         </div>
       </div>
 
-      {/* ── Documents link (if conditional or under review) ── */}
-      {!isRejected && !isFinal && (
+      {/* ── Documents link : masqué si demande active (bannière globale + page Documents) ── */}
+      {!isRejected && !isFinal && !application.conditional_message?.trim() && (
         <Link
           href="/dashboard/documents"
           className="flex items-center justify-between rounded-lg border border-[#4EA6F5]/20

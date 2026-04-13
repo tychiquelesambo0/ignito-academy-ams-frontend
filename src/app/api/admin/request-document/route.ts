@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { sendDocumentRequestEmail } from '@/lib/email/document-request-notification'
 import { z } from 'zod'
 
 const Schema = z.object({
@@ -107,7 +108,50 @@ export async function POST(req: NextRequest) {
       })
       .then()
 
-    return NextResponse.json({ success: true, updated })
+    // ── 5. Notifier le candidat par courriel ─────────────────────────────────
+    const { data: appRow } = await admin
+      .from('applications')
+      .select('user_id')
+      .eq('applicant_id', applicantId)
+      .maybeSingle()
+
+    let emailResult:
+      | { sent: true; wasMock: boolean }
+      | { sent: false; error: string; wasMock?: boolean }
+      | null = null
+
+    if (appRow?.user_id) {
+      const { data: applicantRow } = await admin
+        .from('applicants')
+        .select('prenom, nom, email')
+        .eq('id', appRow.user_id)
+        .maybeSingle()
+
+      if (applicantRow?.email) {
+        const r = await sendDocumentRequestEmail({
+          to:           applicantRow.email,
+          prenom:       applicantRow.prenom ?? '',
+          nom:          applicantRow.nom ?? '',
+          applicantId,
+          message:      message.trim(),
+        })
+        emailResult = r.ok
+          ? { sent: true, wasMock: r.wasMock }
+          : { sent: false, error: r.error }
+      } else {
+        emailResult = { sent: false, error: 'Adresse courriel du candidat introuvable.' }
+      }
+    } else {
+      emailResult = { sent: false, error: 'Lien candidat introuvable pour l\'envoi du courriel.' }
+    }
+
+    return NextResponse.json({
+      success:      true,
+      updated,
+      emailSent:    emailResult !== null && emailResult.sent,
+      emailWasMock: emailResult !== null && emailResult.sent ? emailResult.wasMock : undefined,
+      emailError:   emailResult !== null && !emailResult.sent ? emailResult.error : undefined,
+    })
 
   } catch (err) {
     console.error('[admin/request-document] unexpected error:', err)

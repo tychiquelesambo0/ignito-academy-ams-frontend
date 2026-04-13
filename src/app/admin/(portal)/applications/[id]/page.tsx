@@ -414,7 +414,18 @@ export default function ApplicationDetailPage() {
       ? { ...prev, conditional_message: docRequestMsg.trim() }
       : null
     )
-    setDocRequestSuccess('Demande envoyée. Le candidat verra votre message sur son tableau de bord.')
+
+    let successLine =
+      'Demande enregistrée. Une bannière visible s\'affiche sur l\'espace candidat ; le message figure également sur la page Documents.'
+    if (json.emailSent) {
+      successLine = json.emailWasMock
+        ? `${successLine} (Mode courriel simulé : configurez RESEND_API_KEY pour un envoi réel.)`
+        : `${successLine} Un courriel de notification a été envoyé au candidat.`
+    } else if (typeof json.emailError === 'string' && json.emailError) {
+      successLine = `${successLine} Attention : le courriel n'a pas pu être envoyé (${json.emailError}).`
+    }
+
+    setDocRequestSuccess(successLine)
     setDocRequestMsg('')
     fetchData()
     setTimeout(() => setDocRequestSuccess(null), 6000)
