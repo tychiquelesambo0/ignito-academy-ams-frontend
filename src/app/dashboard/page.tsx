@@ -14,12 +14,13 @@
  *   Navy #021463 · Blue #4EA6F5 · Green #10B981 · Amber #F59E0B · Error #EF4444
  *   font-serif (Crimson Pro) for all headings
  *   rounded-md / rounded-lg only — never rounded-full
- *   No red CTAs. 29 USD hardcoded everywhere — no CDF.
+ *   No red CTAs. Fee amount driven by APPLICATION_FEE_USD — no CDF.
  */
 
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { APPLICATION_FEE_USD } from '@/lib/payment/currency'
 import {
   FolderOpen,
   CheckCircle2,
@@ -570,9 +571,9 @@ function InProgressState({
             Frais de dossier — non remboursables.
           </p>
 
-          {/* Fee display — strictly 29 USD, hardcoded */}
+          {/* Fee display — amount driven by APPLICATION_FEE_USD */}
           <div className="mt-3 flex items-baseline justify-center gap-1 rounded-md bg-slate-50 py-2.5">
-            <span className="font-serif text-2xl font-bold text-[#021463]">29</span>
+            <span className="font-serif text-2xl font-bold text-[#021463]">{APPLICATION_FEE_USD}</span>
             <span className="text-xs font-bold text-slate-400">USD</span>
           </div>
 
@@ -583,7 +584,7 @@ function InProgressState({
                          bg-[#021463] text-xs font-semibold text-white
                          transition-colors hover:bg-[#031a80]"
             >
-              Payer 29 USD
+              Payer {APPLICATION_FEE_USD} USD
             </Link>
           ) : (
             <button
@@ -745,7 +746,7 @@ function SubmittedState({
             </div>
           </div>
 
-          {/* Paiement summary — strictly 29 USD, never CDF */}
+          {/* Paiement summary — amount driven by APPLICATION_FEE_USD */}
           <div className="rounded-lg bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[#10B981]/10">
@@ -756,7 +757,7 @@ function SubmittedState({
               </h3>
             </div>
             <p className="text-sm font-medium text-slate-700">
-              29 USD{' '}
+              {APPLICATION_FEE_USD} USD{' '}
               <span className="font-normal text-slate-400">— Frais de dossier</span>
             </p>
             {application.payment_confirmed_at && (
@@ -771,7 +772,7 @@ function SubmittedState({
             <div className="mt-4 flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5 text-[#10B981]" />
               <span className="text-[11px] font-bold text-[#10B981]">
-                29 USD Confirmé
+                {APPLICATION_FEE_USD} USD Confirmé
               </span>
             </div>
           </div>
