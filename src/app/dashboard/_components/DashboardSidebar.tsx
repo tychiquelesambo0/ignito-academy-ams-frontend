@@ -121,25 +121,22 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
 
               // ── Locked item — not a link ──────────────────────────────────
               if (locked) {
-                // Build the tooltip message. For the scholarship step we give a
-                // specific explanation so the applicant understands why it's locked.
                 const isScholarshipStep = step.id === 'scholarship'
-                let tooltipTitle: string
-                let tooltipBody: string | null = null
 
+                // For the scholarship step, determine the specific reason message.
+                // For all other locked steps, keep the generic lock icon only.
+                let expandedMsg: string | null = null
                 if (isScholarshipStep && scholarshipIneligible) {
-                  tooltipTitle = 'Non éligible à la bourse'
-                  tooltipBody =
-                    'Votre dossier académique ne remplit pas les critères requis (moyenne ≥ 70 % en Terminale et à l\'EXETAT).'
+                  expandedMsg =
+                    "Votre dossier académique ne remplit pas les critères requis : moyenne ≥ 70 % en Terminale et à l'EXETAT."
                 } else if (isScholarshipStep) {
-                  tooltipTitle = 'Bourse d\'Excellence verrouillée'
-                  tooltipBody = 'Finalisez votre paiement pour débloquer cette étape.'
-                } else {
-                  tooltipTitle = `Complétez « ${step.prerequisiteLabel} » d'abord`
+                  expandedMsg =
+                    'Finalisez votre paiement des frais de dossier pour débloquer cette étape.'
                 }
 
                 return (
-                  <li key={step.id} className="group/locked relative">
+                  <li key={step.id} className="group/locked">
+                    {/* Row */}
                     <span
                       aria-disabled="true"
                       className="flex min-h-[48px] cursor-not-allowed items-center gap-3
@@ -148,37 +145,27 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
                     >
                       <Icon className="h-4 w-4 shrink-0 text-white/20" />
                       <span className="flex-1 truncate">{step.label}</span>
-                      {/* Info icon for scholarship ineligible, lock icon for other steps */}
-                      {isScholarshipStep && scholarshipIneligible
+                      {isScholarshipStep
                         ? <Info className="h-3.5 w-3.5 shrink-0 text-white/30" />
                         : <Lock className="h-3 w-3 shrink-0 text-white/20" />
                       }
                     </span>
 
-                    {/* ── Custom tooltip — appears to the right on hover ── */}
-                    <div
-                      role="tooltip"
-                      className="pointer-events-none absolute left-full top-1/2 z-50 ml-3
-                                 w-56 -translate-y-1/2 rounded-lg bg-slate-900 px-3.5 py-3
-                                 shadow-xl opacity-0 transition-opacity duration-150
-                                 group-hover/locked:opacity-100
-                                 lg:block hidden"
-                    >
-                      {/* Arrow pointing left */}
-                      <span
-                        aria-hidden="true"
-                        className="absolute -left-1.5 top-1/2 h-3 w-3 -translate-y-1/2
-                                   rotate-45 rounded-sm bg-slate-900"
-                      />
-                      <p className="relative text-xs font-semibold text-white leading-snug">
-                        {tooltipTitle}
-                      </p>
-                      {tooltipBody && (
-                        <p className="relative mt-1 text-[11px] leading-relaxed text-slate-400">
-                          {tooltipBody}
+                    {/* Inline expanding message — slides open on hover.
+                        Stays fully inside the sidebar so overflow-y-auto
+                        on the nav never clips it. */}
+                    {expandedMsg && (
+                      <div
+                        className="mx-2 mb-1 max-h-0 overflow-hidden
+                                   transition-all duration-200 ease-in-out
+                                   group-hover/locked:max-h-24"
+                      >
+                        <p className="rounded-md bg-white/6 px-3 py-2
+                                      text-[11px] leading-relaxed text-white/45">
+                          {expandedMsg}
                         </p>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </li>
                 )
               }
