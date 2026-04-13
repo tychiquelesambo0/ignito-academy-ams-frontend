@@ -30,6 +30,7 @@ import {
   AlertCircle,
   Play,
   ChevronRight,
+  ShieldCheck,
 } from 'lucide-react'
 import { useApplication } from '@/lib/context/ApplicationContext'
 import BackButton from '@/components/dashboard/BackButton'
@@ -155,6 +156,76 @@ function NotEligibleView() {
   )
 }
 
+// ─── Submitted (locked) view ──────────────────────────────────────────────────
+// Once the video URL is saved the dossier is sealed — no further editing.
+
+function SubmittedView({ videoUrl }: { videoUrl: string }) {
+  const embedUrl = toEmbedUrl(videoUrl)
+
+  return (
+    <div className="space-y-5 animate-in fade-in duration-300">
+
+      {/* Lock banner */}
+      <div className="flex items-start gap-3.5 rounded-lg border border-[#10B981]/25
+                      bg-[#10B981]/8 px-5 py-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center
+                        rounded-md bg-[#10B981]/15">
+          <ShieldCheck className="h-4.5 w-4.5 text-[#10B981]" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-slate-800">
+            Candidature soumise — en cours d'évaluation
+          </p>
+          <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
+            Votre vidéo de présentation a été reçue. Notre jury l'évaluera
+            prochainement. Vous serez notifié par email dès qu'une décision
+            sera rendue. Aucune modification n'est possible à ce stade.
+          </p>
+        </div>
+      </div>
+
+      {/* Video preview — read-only */}
+      {embedUrl ? (
+        <div className="overflow-hidden rounded-lg shadow-sm">
+          <div className="aspect-video w-full">
+            <iframe
+              src={embedUrl}
+              className="h-full w-full"
+              allowFullScreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center rounded-lg border border-slate-200
+                        bg-slate-50 py-12">
+          <p className="text-sm text-slate-400">Aperçu indisponible</p>
+        </div>
+      )}
+
+      {/* External link + lock indicator */}
+      <div className="flex items-center justify-between">
+        <a
+          href={videoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-400
+                     transition-colors hover:text-[#4EA6F5]"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          Ouvrir dans un nouvel onglet
+        </a>
+        <span className="inline-flex items-center gap-1.5 rounded border
+                         border-slate-200 bg-slate-50 px-2.5 py-1
+                         text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+          <Lock className="h-3 w-3" />
+          Verrouillé
+        </span>
+      </div>
+    </div>
+  )
+}
+
 function AwardedView({ videoUrl }: { videoUrl: string }) {
   const embedUrl = toEmbedUrl(videoUrl)
   return (
@@ -217,20 +288,18 @@ function RejectedView() {
 export default function ScholarshipPage() {
   const { application, refetch } = useApplication()
 
-  const [videoUrl, setVideoUrl]     = useState('')
-  const [saving, setSaving]         = useState(false)
-  const [saveError, setSaveError]   = useState<string | null>(null)
-  const [saveSuccess, setSaveSuccess] = useState(false)
-  const [isEditing, setIsEditing]   = useState(false)
+  const [videoUrl, setVideoUrl]   = useState('')
+  const [saving, setSaving]       = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
-  // Pre-fill from saved value
+  // Pre-fill input from any previously saved (but not yet locked) value
   useEffect(() => {
     if (application?.scholarship_video_url) {
       setVideoUrl(application.scholarship_video_url)
     }
   }, [application?.scholarship_video_url])
 
-  // ── Derived state ──────────────────────────────────────────────────────────
+  // ── Loading ────────────────────────────────────────────────────────────────
   if (!application) {
     return (
       <div className="flex items-center justify-center py-24">
@@ -239,24 +308,21 @@ export default function ScholarshipPage() {
     )
   }
 
+  // ── State machine ─────────────────────────────────────────────────────────
+
   const paymentConfirmed =
     application.payment_status === 'Confirmed' ||
     application.payment_status === 'Waived'
 
   if (!paymentConfirmed) return (
-    <div className="space-y-8">
-      <PageHeader />
-      <PaymentPendingView />
-    </div>
+    <div className="space-y-8"><PageHeader /><PaymentPendingView /></div>
   )
 
   if (!application.is_scholarship_eligible) return (
-    <div className="space-y-8">
-      <PageHeader />
-      <NotEligibleView />
-    </div>
+    <div className="space-y-8"><PageHeader /><NotEligibleView /></div>
   )
 
+  // Awarded / Rejected are admin-set terminal states
   if (application.scholarship_status === 'Awarded') return (
     <div className="space-y-8">
       <PageHeader />
@@ -265,37 +331,51 @@ export default function ScholarshipPage() {
   )
 
   if (application.scholarship_status === 'Rejected') return (
+    <div className="space-y-8"><PageHeader /><RejectedView /></div>
+  )
+
+  // ── SUBMITTED — video saved → locked, no editing ──────────────────────────
+  if (application.scholarship_video_url) return (
     <div className="space-y-8">
       <PageHeader />
-      <RejectedView />
+
+      {/* Eligibility badge */}
+      <div className="flex items-center gap-2 rounded-md border border-[#10B981]/25
+                      bg-[#10B981]/8 px-4 py-2.5 w-fit">
+        <CheckCircle2 className="h-4 w-4 text-[#10B981]" />
+        <span className="text-sm font-medium text-[#10B981]">
+          Éligible à la Bourse d&apos;Excellence 2026
+        </span>
+      </div>
+
+      <SubmittedView videoUrl={application.scholarship_video_url} />
     </div>
   )
 
-  // ── Submit handler ─────────────────────────────────────────────────────────
+  // ── FORM — eligible, no video submitted yet ────────────────────────────────
+
+  const embedUrl   = toEmbedUrl(videoUrl)
+  const urlIsValid = isValidVideoUrl(videoUrl)
+  const showPreview = urlIsValid && !!embedUrl
+
   const handleSave = async () => {
-    if (!isValidVideoUrl(videoUrl)) {
+    if (!urlIsValid) {
       setSaveError('Veuillez entrer une URL YouTube ou Vimeo valide.')
       return
     }
-
     setSaving(true)
     setSaveError(null)
-    setSaveSuccess(false)
-
     try {
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
-
       const { error } = await supabase
         .from('applications')
         .update({ scholarship_video_url: videoUrl.trim() })
         .eq('id', application.id)
-
       if (error) throw new Error(error.message)
-
       await refetch()
-      setSaveSuccess(true)
-      setIsEditing(false)
+      // After refetch the application.scholarship_video_url is set →
+      // the component re-renders into the SUBMITTED branch above.
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde.')
     } finally {
@@ -303,32 +383,25 @@ export default function ScholarshipPage() {
     }
   }
 
-  // ── Eligible — show form or submitted view ─────────────────────────────────
-  const hasVideo    = !!application.scholarship_video_url
-  const embedUrl    = toEmbedUrl(videoUrl)
-  const urlIsValid  = isValidVideoUrl(videoUrl)
-  const showPreview = urlIsValid && !!embedUrl
-  const showForm    = !hasVideo || isEditing
-
   return (
     <div className="space-y-8">
       <PageHeader />
 
-      {/* ── Eligibility badge ── */}
+      {/* Eligibility badge */}
       <div className="flex items-center gap-2 rounded-md border border-[#10B981]/25
                       bg-[#10B981]/8 px-4 py-2.5 w-fit">
         <CheckCircle2 className="h-4 w-4 text-[#10B981]" />
         <span className="text-sm font-medium text-[#10B981]">
-          Éligible à la Bourse d'Excellence 2026
+          Éligible à la Bourse d&apos;Excellence 2026
         </span>
       </div>
 
-      {/* ── Description card ── */}
+      {/* Instructions card */}
       <div className="rounded-lg bg-white p-6 shadow-sm space-y-3">
         <div className="flex items-start gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center
                           rounded-md bg-[#031463]/8">
-            <Award className="h-4.5 w-4.5 text-[#031463]" />
+            <Award className="h-5 w-5 text-[#031463]" />
           </div>
           <div>
             <h2 className="font-serif text-base font-semibold text-slate-800">
@@ -337,203 +410,117 @@ export default function ScholarshipPage() {
             <p className="mt-1 text-sm leading-relaxed text-slate-500">
               Enregistrez une vidéo de présentation (2 à 5 minutes) dans laquelle
               vous expliquez votre motivation, vos ambitions académiques et pourquoi
-              vous méritez la Bourse d'Excellence d'Ignito Academy.
+              vous méritez la Bourse d&apos;Excellence d&apos;Ignito Academy.
               Publiez-la sur YouTube ou Vimeo et collez le lien ci-dessous.
             </p>
           </div>
         </div>
-
         <ul className="mt-1 ml-12 space-y-1 text-xs text-slate-500">
-          <li className="flex items-center gap-1.5">
-            <span className="h-1 w-1 rounded-full bg-[#4EA6F5]" />
-            Durée : 2 à 5 minutes
-          </li>
-          <li className="flex items-center gap-1.5">
-            <span className="h-1 w-1 rounded-full bg-[#4EA6F5]" />
-            Langue : français ou anglais
-          </li>
-          <li className="flex items-center gap-1.5">
-            <span className="h-1 w-1 rounded-full bg-[#4EA6F5]" />
-            Plateformes acceptées : YouTube · Vimeo
-          </li>
+          {[
+            'Durée : 2 à 5 minutes',
+            'Langue : français ou anglais',
+            'Plateformes acceptées : YouTube · Vimeo',
+          ].map((item) => (
+            <li key={item} className="flex items-center gap-1.5">
+              <span className="h-1 w-1 rounded-full bg-[#4EA6F5]" />
+              {item}
+            </li>
+          ))}
         </ul>
       </div>
 
-      {/* ── Video submitted — read-only view + edit option ── */}
-      {hasVideo && !isEditing && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-[#10B981]" />
-              <span className="text-sm font-medium text-[#10B981]">
-                Vidéo de présentation soumise
-              </span>
-            </div>
-            {application.scholarship_status !== 'Awarded' && (
-              <button
-                onClick={() => { setIsEditing(true); setSaveSuccess(false) }}
-                className="text-xs font-medium text-[#4EA6F5] hover:underline"
-              >
-                Modifier le lien
-              </button>
-            )}
+      {/* URL input */}
+      <div className="rounded-lg bg-white p-6 shadow-sm space-y-5">
+        <div className="space-y-1.5">
+          <label htmlFor="video-url" className="block text-sm font-medium text-slate-700">
+            Lien de votre vidéo <span className="text-[#EF4444]">*</span>
+          </label>
+          <div className="relative">
+            <Play className="pointer-events-none absolute left-3 top-1/2 h-4 w-4
+                             -translate-y-1/2 text-slate-400" />
+            <input
+              id="video-url"
+              type="url"
+              value={videoUrl}
+              onChange={(e) => { setVideoUrl(e.target.value); setSaveError(null) }}
+              placeholder="https://www.youtube.com/watch?v=… ou https://vimeo.com/…"
+              className="h-12 w-full rounded-md border border-slate-200 bg-white
+                         pl-10 pr-4 text-sm text-slate-800 outline-none
+                         focus:border-[#4EA6F5] focus:ring-2 focus:ring-[#4EA6F5]/20
+                         placeholder:text-slate-400"
+            />
           </div>
-
-          {/* Video preview */}
-          <div className="overflow-hidden rounded-lg shadow-sm">
-            <div className="aspect-video w-full">
-              <iframe
-                src={toEmbedUrl(application.scholarship_video_url ?? '') ?? ''}
-                className="h-full w-full"
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              />
-            </div>
-          </div>
-
-          <a
-            href={application.scholarship_video_url ?? '#'}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-slate-400
-                       hover:text-[#4EA6F5] transition-colors"
-          >
-            <ExternalLink className="h-3.5 w-3.5" />
-            Ouvrir dans un nouvel onglet
-          </a>
-
-          {/* Status badge */}
-          <div className="rounded-md bg-amber-50 border border-amber-200 px-4 py-3">
-            <p className="text-sm font-medium text-amber-800">
-              Votre candidature est en cours d'évaluation par notre jury.
-            </p>
-            <p className="mt-0.5 text-xs text-amber-600">
-              Vous serez notifié par email une fois la décision rendue.
-            </p>
-          </div>
+          <p className="text-xs text-slate-400">
+            Collez l&apos;URL complète de votre vidéo YouTube ou Vimeo.
+          </p>
         </div>
-      )}
 
-      {/* ── URL input form ── */}
-      {showForm && (
-        <div className="rounded-lg bg-white p-6 shadow-sm space-y-5">
-          <div className="space-y-1.5">
-            <label
-              htmlFor="video-url"
-              className="block text-sm font-medium text-slate-700"
-            >
-              Lien de votre vidéo{' '}
-              <span className="text-[#EF4444]">*</span>
-            </label>
-            <div className="relative">
-              <Play className="pointer-events-none absolute left-3 top-1/2 h-4 w-4
-                               -translate-y-1/2 text-slate-400" />
-              <input
-                id="video-url"
-                type="url"
-                value={videoUrl}
-                onChange={(e) => {
-                  setVideoUrl(e.target.value)
-                  setSaveError(null)
-                  setSaveSuccess(false)
-                }}
-                placeholder="https://www.youtube.com/watch?v=… ou https://vimeo.com/…"
-                className="h-12 w-full rounded-md border border-slate-200 bg-white
-                           pl-10 pr-4 text-sm text-slate-800 outline-none
-                           focus:border-[#4EA6F5] focus:ring-2 focus:ring-[#4EA6F5]/20
-                           placeholder:text-slate-400"
-              />
-            </div>
-            <p className="text-xs text-slate-400">
-              Collez l'URL complète de votre vidéo YouTube ou Vimeo.
+        {/* Live preview */}
+        {showPreview && (
+          <div className="space-y-2">
+            <p className="flex items-center gap-1.5 text-xs font-medium text-[#10B981]">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Aperçu de votre vidéo
             </p>
-          </div>
-
-          {/* Live preview */}
-          {showPreview && (
-            <div className="space-y-2">
-              <p className="flex items-center gap-1.5 text-xs font-medium text-[#10B981]">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Aperçu de votre vidéo
-              </p>
-              <div className="overflow-hidden rounded-lg shadow-sm">
-                <div className="aspect-video w-full">
-                  <iframe
-                    src={embedUrl!}
-                    className="h-full w-full"
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  />
-                </div>
+            <div className="overflow-hidden rounded-lg shadow-sm">
+              <div className="aspect-video w-full">
+                <iframe
+                  src={embedUrl!}
+                  className="h-full w-full"
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                />
               </div>
             </div>
-          )}
-
-          {/* Invalid URL warning */}
-          {videoUrl && !urlIsValid && (
-            <div className="flex items-center gap-2 text-xs text-amber-600">
-              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-              URL non reconnue — assurez-vous d'utiliser un lien YouTube ou Vimeo valide.
-            </div>
-          )}
-
-          {/* Error */}
-          {saveError && (
-            <div className="flex items-start gap-2 rounded-md border border-[#EF4444]/20
-                            bg-[#EF4444]/5 px-3 py-2.5">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#EF4444]" />
-              <p className="text-sm text-[#EF4444]">{saveError}</p>
-            </div>
-          )}
-
-          {/* Success */}
-          {saveSuccess && (
-            <div className="flex items-center gap-2 rounded-md border border-[#10B981]/20
-                            bg-[#10B981]/8 px-3 py-2.5">
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-[#10B981]" />
-              <p className="text-sm font-medium text-[#10B981]">
-                Votre vidéo a été soumise avec succès.
-              </p>
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            {isEditing && (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsEditing(false)
-                  setVideoUrl(application.scholarship_video_url ?? '')
-                  setSaveError(null)
-                }}
-                className="h-12 flex-1 rounded-md border border-slate-200 text-sm
-                           font-medium text-slate-600 transition-colors hover:bg-slate-50"
-              >
-                Annuler
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={saving || !urlIsValid}
-              className="h-12 flex-1 rounded-md bg-[#031463] text-sm font-semibold
-                         text-white transition-colors hover:bg-[#031463]/90
-                         disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {saving ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Enregistrement…
-                </span>
-              ) : hasVideo ? (
-                'Mettre à jour la vidéo'
-              ) : (
-                'Soumettre ma candidature'
-              )}
-            </button>
           </div>
+        )}
+
+        {/* Invalid URL warning */}
+        {videoUrl && !urlIsValid && (
+          <div className="flex items-center gap-2 text-xs text-amber-600">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+            URL non reconnue — assurez-vous d&apos;utiliser un lien YouTube ou Vimeo valide.
+          </div>
+        )}
+
+        {/* Error */}
+        {saveError && (
+          <div className="flex items-start gap-2 rounded-md border border-[#EF4444]/20
+                          bg-[#EF4444]/5 px-3 py-2.5">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#EF4444]" />
+            <p className="text-sm text-[#EF4444]">{saveError}</p>
+          </div>
+        )}
+
+        {/* Warning: submission is final */}
+        <div className="flex items-start gap-2 rounded-md border border-amber-200
+                        bg-amber-50 px-3.5 py-3">
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+          <p className="text-xs text-amber-700 leading-relaxed">
+            <span className="font-semibold">Attention :</span> une fois soumise, votre
+            candidature est définitive et ne peut plus être modifiée.
+            Vérifiez bien votre lien avant de confirmer.
+          </p>
         </div>
-      )}
+
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving || !urlIsValid}
+          className="h-12 w-full rounded-md bg-[#031463] text-sm font-semibold
+                     text-white transition-colors hover:bg-[#031463]/90
+                     disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {saving ? (
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Envoi en cours…
+            </span>
+          ) : (
+            'Soumettre ma candidature'
+          )}
+        </button>
+      </div>
     </div>
   )
 }
