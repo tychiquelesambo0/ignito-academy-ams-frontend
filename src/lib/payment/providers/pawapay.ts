@@ -43,24 +43,34 @@ const DRC_CORRESPONDENTS = {
 
 /**
  * Pawa Pay API response types
+ *
+ * Note: PawaPay uses "rejectionReason" (with "rejectionCode" / "rejectionMessage")
+ * on the initial deposit creation response when status === 'REJECTED'.
+ * On final webhook callbacks, it uses "failureReason" with "failureCode" / "failureMessage".
  */
 interface PawaPayDepositResponse {
   depositId: string
-  status: 'ACCEPTED' | 'COMPLETED' | 'FAILED' | 'REJECTED'
-  amount: string
-  currency: string
-  correspondent: string
-  payer: {
+  status: 'ACCEPTED' | 'COMPLETED' | 'FAILED' | 'REJECTED' | 'DUPLICATE_IGNORED'
+  amount?: string
+  currency?: string
+  correspondent?: string
+  payer?: {
     type: string
     address: {
       value: string
     }
   }
-  created: string
+  created?: string
   respondedByPayer?: string
+  // Used on webhook callbacks (final status)
   failureReason?: {
     failureMessage: string
     failureCode: string
+  }
+  // Used on initial deposit response when REJECTED
+  rejectionReason?: {
+    rejectionCode: string
+    rejectionMessage: string
   }
 }
 
@@ -74,34 +84,49 @@ export class PawaPayProvider implements IPaymentProvider {
   }
 
   /**
-   * Detect mobile money provider from phone number
-   * Task 6.3: Map phone prefixes to correspondent codes
+   * Normalize a DRC phone number to MSISDN format (digits only, starting with 243).
+   *
+   * Accepts all common DRC input formats:
+   *   +243824401073  →  243824401073
+   *   243824401073   →  243824401073  (already correct)
+   *   0824401073     →  243824401073  (national format, leading 0)
+   *   824401073      →  243824401073  (subscriber-only, 9 digits)
+   */
+  private normalizeToMsisdn(phoneNumber: string): string {
+    const digits = phoneNumber.replace(/\D/g, '') // strip all non-digits
+
+    if (digits.startsWith('243') && digits.length === 12) return digits          // already MSISDN
+    if (digits.startsWith('0') && digits.length === 10) return '243' + digits.slice(1) // national
+    if (digits.length === 9) return '243' + digits                               // subscriber only
+    if (digits.length === 12 && digits.startsWith('243')) return digits          // repeat safety
+    // Fallback: return stripped digits and let PawaPay validate
+    return digits
+  }
+
+  /**
+   * Detect mobile money provider from phone number.
+   * Handles all DRC input formats (+243..., 243..., 0..., plain 9-digit).
    */
   private detectCorrespondent(phoneNumber: string): string {
-    // Remove +243 prefix
-    const number = phoneNumber.replace('+243', '')
-    
-    // Vodacom: 81, 82, 83, 84, 85
-    if (/^8[12345]/.test(number)) {
-      return DRC_CORRESPONDENTS.VODACOM
-    }
-    
-    // Airtel: 97, 98, 99
-    if (/^9[789]/.test(number)) {
-      return DRC_CORRESPONDENTS.AIRTEL
-    }
-    
-    // Orange: 80, 89, 90
-    if (/^(80|89|90)/.test(number)) {
-      return DRC_CORRESPONDENTS.ORANGE
-    }
-    
-    // Africell: 91, 92, 93, 94, 95, 96
-    if (/^9[123456]/.test(number)) {
+    // Normalise to 12-digit MSISDN (243XXXXXXXXX), then extract the 9 subscriber digits
+    const msisdn = this.normalizeToMsisdn(phoneNumber)
+    const subscriber = msisdn.startsWith('243') ? msisdn.slice(3) : msisdn
+
+    // Vodacom M-Pesa: 081, 082, 083, 084, 085
+    if (/^8[12345]/.test(subscriber)) return DRC_CORRESPONDENTS.VODACOM
+
+    // Airtel: 097, 098, 099
+    if (/^9[789]/.test(subscriber)) return DRC_CORRESPONDENTS.AIRTEL
+
+    // Orange: 080, 089, 090
+    if (/^(80|89|90)/.test(subscriber)) return DRC_CORRESPONDENTS.ORANGE
+
+    // Africell: 091-096 — no PawaPay support, fall back to Vodacom
+    if (/^9[123456]/.test(subscriber)) {
+      console.warn(`[PawaPayProvider] Africell (${phoneNumber}) not supported by PawaPay; defaulting to Vodacom`)
       return DRC_CORRESPONDENTS.AFRICELL
     }
-    
-    // Default to Vodacom (most common)
+
     console.warn(`[PawaPayProvider] Unknown phone prefix for ${phoneNumber}, defaulting to Vodacom`)
     return DRC_CORRESPONDENTS.VODACOM
   }
@@ -145,14 +170,15 @@ export class PawaPayProvider implements IPaymentProvider {
       const depositId = crypto.randomUUID()
       console.log(`   Deposit ID: ${depositId} (${depositId.length} chars)`)
 
-      // MSISDN format: international number WITHOUT the leading '+' sign.
-      // PawaPay requires "243812345678", not "+243812345678".
-      const msisdn = request.phoneNumber.replace(/^\+/, '')
-      console.log(`   MSISDN (no +): ${msisdn}`)
+      // Normalise to MSISDN (digits-only, country code included, no '+').
+      // e.g. "+243824401073" → "243824401073", "0824401073" → "243824401073"
+      const msisdn = this.normalizeToMsisdn(request.phoneNumber)
+      console.log(`   MSISDN (normalised): ${msisdn}`)
 
-      // PawaPay enforces a 22-character max on statementDescription.
-      // Truncate and use a short, fixed label to avoid validation rejection.
-      const statementDescription = 'Ignito Academy Admiss.'  // exactly 22 chars
+      // PawaPay statementDescription rules:
+      //  - Max 22 characters
+      //  - ONLY alphanumeric characters and spaces (NO punctuation, no dots, no dashes)
+      const statementDescription = 'Ignito Academy Admiss'  // 21 chars, alphanumeric + spaces only
 
       // Prepare Pawa Pay deposit request
       const pawaPayRequest = {
@@ -206,11 +232,30 @@ export class PawaPayProvider implements IPaymentProvider {
 
       const pawaPayResponse: PawaPayDepositResponse = await response.json()
 
-      console.log('✅ Payment initiated successfully!')
       console.log(`   Deposit ID: ${pawaPayResponse.depositId}`)
       console.log(`   Status: ${pawaPayResponse.status}`)
       console.log('📦 Full Pawa Pay Response:', JSON.stringify(pawaPayResponse, null, 2))
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
+
+      // PawaPay returns HTTP 200 for REJECTED deposits — we must check the status field.
+      if (pawaPayResponse.status === 'REJECTED') {
+        const reason =
+          pawaPayResponse.rejectionReason?.rejectionMessage ??
+          pawaPayResponse.failureReason?.failureMessage ??
+          'Deposit rejected by PawaPay'
+        const code =
+          pawaPayResponse.rejectionReason?.rejectionCode ??
+          pawaPayResponse.failureReason?.failureCode ??
+          'REJECTED'
+        console.error(`❌ Deposit REJECTED by PawaPay: [${code}] ${reason}`)
+        return {
+          success: false,
+          error: `PawaPay a rejeté le paiement: ${reason} (code: ${code})`,
+          status: 'Failed',
+        }
+      }
+
+      console.log('✅ Deposit accepted by PawaPay!')
 
       // Map Pawa Pay status to our status
       const status = this.mapPawaPayStatus(pawaPayResponse.status)
