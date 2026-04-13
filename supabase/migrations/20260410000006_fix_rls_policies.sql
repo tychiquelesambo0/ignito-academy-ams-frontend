@@ -9,6 +9,11 @@
 -- ============================================================================
 -- ADMISSIONS OFFICERS TABLE POLICIES (Fixed)
 -- ============================================================================
+-- Idempotent: policies may already exist on remotes that partially ran earlier migrations.
+
+DROP POLICY IF EXISTS admissions_officers_select_own ON admissions_officers;
+DROP POLICY IF EXISTS admissions_officers_insert_admin ON admissions_officers;
+DROP POLICY IF EXISTS admissions_officers_update_admin ON admissions_officers;
 
 -- Officers can read their own record (no recursion)
 CREATE POLICY admissions_officers_select_own
@@ -45,6 +50,10 @@ CREATE POLICY admissions_officers_update_admin
 -- ============================================================================
 -- RE-ADD ADMIN POLICIES FOR OTHER TABLES
 -- ============================================================================
+
+DROP POLICY IF EXISTS applicants_select_admin ON applicants;
+DROP POLICY IF EXISTS applications_select_admin ON applications;
+DROP POLICY IF EXISTS applications_update_admin ON applications;
 
 -- Admissions officers can read all applicants
 CREATE POLICY applicants_select_admin
