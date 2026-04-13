@@ -31,6 +31,7 @@ import {
   Smartphone,
   ChevronRight,
   Info,
+  Award,
 } from 'lucide-react'
 import { useApplication } from '@/lib/context/ApplicationContext'
 import type { Application, Applicant } from '@/lib/context/ApplicationContext'
@@ -104,107 +105,166 @@ function formatCountdown(seconds: number): string {
   return `${m}:${s}`
 }
 
-// ─── Sub-views ────────────────────────────────────────────────────────────────
+// ─── Scholarship next-step callout ────────────────────────────────────────────
+// Shown only when is_scholarship_eligible === true after payment confirmation.
 
-function AlreadyPaidView({ application }: { application: Application }) {
-  const isWaived = application.payment_status === 'Waived'
-
+function ScholarshipCallout() {
   return (
-    <div className="rounded-lg bg-white border border-emerald-200 px-8 py-10 text-center space-y-5">
-      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100">
-        <CheckCircle2 className="h-8 w-8 text-emerald-600" />
-      </div>
-
-      <div>
-        <h2 className="font-serif text-2xl font-semibold text-slate-800">
-          {isWaived ? 'Frais dispensés' : 'Paiement confirmé'}
-        </h2>
-        <p className="mt-2 text-sm text-slate-500 max-w-sm mx-auto">
-          {isWaived
-            ? "Les frais de dossier ont été dispensés par l'administration."
-            : `Votre paiement de ${ADMISSION_FEE_USD} USD a été reçu et enregistré avec succès.`}
-        </p>
-      </div>
-
-      {application.transaction_id && (
-        <div className="inline-block bg-slate-50 rounded-md px-4 py-2">
-          <p className="text-[10px] uppercase tracking-wide text-slate-400 mb-0.5">
-            Référence de transaction
-          </p>
-          <p className="text-sm font-mono text-slate-600">{application.transaction_id}</p>
+    <div className="rounded-lg border border-amber-200 bg-amber-50 p-5
+                    animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="flex items-start gap-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center
+                        rounded-md bg-amber-100">
+          <Award className="h-5 w-5 text-amber-600" />
         </div>
-      )}
-
-      {application.payment_confirmed_at && (
-        <p className="text-xs text-slate-400">
-          Confirmé le{' '}
-          {new Date(application.payment_confirmed_at).toLocaleDateString('fr-FR', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </p>
-      )}
-
-      <div className="pt-2">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-bold uppercase tracking-widest text-amber-600 mb-1">
+            Étape suivante
+          </p>
+          <h3 className="font-serif text-base font-semibold text-slate-800 leading-snug">
+            Vous êtes éligible à la Bourse d&apos;Excellence !
+          </h3>
+          <p className="mt-1.5 text-sm text-slate-600 leading-relaxed">
+            Votre dossier académique remplit tous les critères requis.
+            Soumettez votre vidéo de candidature pour postuler à la bourse.
+          </p>
+        </div>
+      </div>
+      <div className="mt-4">
         <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-[#031463] hover:underline"
+          href="/dashboard/scholarship"
+          className="inline-flex items-center gap-2 h-11 px-5 rounded-md
+                     bg-[#031463] text-sm font-semibold text-white
+                     transition-colors hover:bg-[#031463]/90"
         >
-          Retour au tableau de bord
-          <ChevronRight className="h-4 w-4" />
+          <Award className="h-4 w-4" />
+          Postuler pour la Bourse d&apos;Excellence
+          <ChevronRight className="h-3.5 w-3.5" />
         </Link>
       </div>
     </div>
   )
 }
 
+// ─── Sub-views ────────────────────────────────────────────────────────────────
+
+function AlreadyPaidView({
+  application,
+  isEligible,
+}: {
+  application: Application
+  isEligible: boolean
+}) {
+  const isWaived = application.payment_status === 'Waived'
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-lg bg-white border border-emerald-200 px-8 py-10 text-center space-y-5">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100">
+          <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+        </div>
+
+        <div>
+          <h2 className="font-serif text-2xl font-semibold text-slate-800">
+            {isWaived ? 'Frais dispensés' : 'Paiement confirmé'}
+          </h2>
+          <p className="mt-2 text-sm text-slate-500 max-w-sm mx-auto">
+            {isWaived
+              ? "Les frais de dossier ont été dispensés par l'administration."
+              : `Votre paiement de ${ADMISSION_FEE_USD} USD a été reçu et enregistré avec succès.`}
+          </p>
+        </div>
+
+        {application.transaction_id && (
+          <div className="inline-block bg-slate-50 rounded-md px-4 py-2">
+            <p className="text-[10px] uppercase tracking-wide text-slate-400 mb-0.5">
+              Référence de transaction
+            </p>
+            <p className="text-sm font-mono text-slate-600">{application.transaction_id}</p>
+          </div>
+        )}
+
+        {application.payment_confirmed_at && (
+          <p className="text-xs text-slate-400">
+            Confirmé le{' '}
+            {new Date(application.payment_confirmed_at).toLocaleDateString('fr-FR', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </p>
+        )}
+
+        <div className="pt-2">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#031463] hover:underline"
+          >
+            Retour au tableau de bord
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Scholarship next-step callout — only for eligible applicants */}
+      {isEligible && <ScholarshipCallout />}
+    </div>
+  )
+}
+
 function ConfirmedView({
   transactionId,
+  isEligible,
   onGoToDashboard,
 }: {
   transactionId: string | null
+  isEligible: boolean
   onGoToDashboard: () => void
 }) {
   return (
-    <div className="rounded-lg bg-white border border-emerald-200 px-8 py-10 text-center space-y-5">
-      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100">
-        <CheckCircle2 className="h-8 w-8 text-emerald-600" />
-      </div>
-
-      <div>
-        <h2 className="font-serif text-2xl font-semibold text-slate-800">
-          Paiement confirmé !
-        </h2>
-        <p className="mt-2 text-sm text-slate-600 max-w-sm mx-auto leading-relaxed">
-          Votre paiement de{' '}
-          <span className="font-semibold text-slate-800">{ADMISSION_FEE_USD} USD</span>{' '}
-          a été enregistré avec succès. Un email de confirmation vous a été envoyé.
-        </p>
-      </div>
-
-      {transactionId && (
-        <div className="inline-block bg-slate-50 rounded-md px-4 py-2.5">
-          <p className="text-[10px] uppercase tracking-wide text-slate-400 mb-0.5">
-            Référence de transaction
-          </p>
-          <p className="text-sm font-mono text-slate-700">{transactionId}</p>
+    <div className="space-y-5">
+      <div className="rounded-lg bg-white border border-emerald-200 px-8 py-10 text-center space-y-5">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100">
+          <CheckCircle2 className="h-8 w-8 text-emerald-600" />
         </div>
-      )}
 
-      <div className="pt-2 flex flex-col items-center gap-3">
-        <button
-          onClick={onGoToDashboard}
-          className="inline-flex items-center gap-2 h-12 px-7 rounded-lg bg-[#031463] text-white text-sm font-medium hover:bg-[#031463]/90 transition-colors"
-        >
-          Retour au tableau de bord
-        </button>
-        <p className="text-xs text-slate-400">
-          Votre dossier est maintenant en cours d'évaluation.
-        </p>
+        <div>
+          <h2 className="font-serif text-2xl font-semibold text-slate-800">
+            Paiement confirmé !
+          </h2>
+          <p className="mt-2 text-sm text-slate-600 max-w-sm mx-auto leading-relaxed">
+            Votre paiement de{' '}
+            <span className="font-semibold text-slate-800">{ADMISSION_FEE_USD} USD</span>{' '}
+            a été enregistré avec succès. Un email de confirmation vous a été envoyé.
+          </p>
+        </div>
+
+        {transactionId && (
+          <div className="inline-block bg-slate-50 rounded-md px-4 py-2.5">
+            <p className="text-[10px] uppercase tracking-wide text-slate-400 mb-0.5">
+              Référence de transaction
+            </p>
+            <p className="text-sm font-mono text-slate-700">{transactionId}</p>
+          </div>
+        )}
+
+        <div className="pt-2 flex flex-col items-center gap-3">
+          <button
+            onClick={onGoToDashboard}
+            className="inline-flex items-center gap-2 h-12 px-7 rounded-lg bg-[#031463] text-white text-sm font-medium hover:bg-[#031463]/90 transition-colors"
+          >
+            Retour au tableau de bord
+          </button>
+          <p className="text-xs text-slate-400">
+            Votre dossier est maintenant en cours d&apos;évaluation.
+          </p>
+        </div>
       </div>
+
+      {/* Scholarship next-step callout — only for eligible applicants */}
+      {isEligible && <ScholarshipCallout />}
     </div>
   )
 }
@@ -544,6 +604,8 @@ function PaymentForm() {
     application.payment_status === 'Confirmed' ||
     application.payment_status === 'Waived'
 
+  const isEligible = application.is_scholarship_eligible === true
+
   if (isAlreadyPaid) {
     return (
       <div className="space-y-8">
@@ -556,7 +618,7 @@ function PaymentForm() {
             Frais d'inscription — {ADMISSION_FEE_USD} USD
           </p>
         </header>
-        <AlreadyPaidView application={application} />
+        <AlreadyPaidView application={application} isEligible={isEligible} />
       </div>
     )
   }
@@ -584,6 +646,7 @@ function PaymentForm() {
         )}
         <ConfirmedView
           transactionId={transactionId}
+          isEligible={isEligible}
           onGoToDashboard={() => router.push('/dashboard')}
         />
       </div>
