@@ -311,9 +311,9 @@ This document breaks down the implementation into manageable tasks organized by 
 - [x] 12.5 Create payment page (PawaPay integration, active reconciliation, dossier lock) ✅ 2026-04-13
 - [x] 12.6 Create document upload page ✅ 2026-04-13
 - [x] 12.7 Create scholarship application page (conditional) ✅ 2026-04-13
-- [ ] 12.8 Implement ApplicationContext for state management
-- [ ] 12.9 Add Supabase Realtime subscriptions
-- [ ] 12.10 Display application status badges
+- [x] 12.8 Implement ApplicationContext for state management ✅ 2026-04-13
+- [x] 12.9 Add Supabase Realtime subscriptions ✅ 2026-04-13
+- [x] 12.10 Display application status badges ✅ 2026-04-13
 
 **Acceptance Criteria:**
 - All dashboard pages accessible to authenticated applicants
