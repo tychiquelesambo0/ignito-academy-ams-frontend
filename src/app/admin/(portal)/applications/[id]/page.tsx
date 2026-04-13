@@ -33,7 +33,6 @@ interface Application {
   intake_year:             number
   ecole_provenance:        string | null
   option_academique:       string | null
-  english_level:           string | null
   exam_status:             string | null
   application_status:      string
   payment_status:          string
@@ -247,7 +246,7 @@ export default function ApplicationDetailPage() {
       .from('applications')
       .select(`
         applicant_id, intake_year, ecole_provenance, option_academique,
-        english_level, exam_status, application_status, payment_status,
+        exam_status, application_status, payment_status,
         transaction_id, payment_confirmed_at, conditional_message,
         created_at, updated_at, graduation_year,
         grade_10_average, grade_11_average, grade_12_average,
@@ -590,7 +589,6 @@ export default function ApplicationDetailPage() {
           <InfoRow label="Option"          value={application.option_academique} />
           <InfoRow label="Année diplôme"   value={application.graduation_year?.toString()} />
           <InfoRow label="Examen d'État"   value={application.exam_status} />
-          <InfoRow label="Niveau d'anglais" value={application.english_level} />
           <InfoRow label="% Exetat"
             value={application.exetat_percentage != null
               ? `${application.exetat_percentage}%`
