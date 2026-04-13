@@ -11,6 +11,9 @@
 
 -- Ensure payment_amount_paid is exactly 29 USD (application fee) when not NULL
 ALTER TABLE applications
+  DROP CONSTRAINT IF EXISTS applications_payment_amount_check;
+
+ALTER TABLE applications
 ADD CONSTRAINT applications_payment_amount_check 
 CHECK (payment_amount_paid IS NULL OR payment_amount_paid = 29);
 
@@ -22,6 +25,9 @@ CHECK (payment_amount_paid IS NULL OR payment_amount_paid = 29);
 -- ============================================================================
 
 -- Ensure all webhook amounts are in USD
+ALTER TABLE webhook_logs
+  DROP CONSTRAINT IF EXISTS webhook_logs_currency_check;
+
 ALTER TABLE webhook_logs
 ADD CONSTRAINT webhook_logs_currency_check 
 CHECK (
@@ -38,6 +44,9 @@ CHECK (
 -- We'll add an additional constraint for maximum refund amount
 
 -- Ensure refund amount is reasonable (max $10,000)
+ALTER TABLE refund_transactions
+  DROP CONSTRAINT IF EXISTS refund_transactions_max_amount_check;
+
 ALTER TABLE refund_transactions
 ADD CONSTRAINT refund_transactions_max_amount_check 
 CHECK (amount <= 10000);

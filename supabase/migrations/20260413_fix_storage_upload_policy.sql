@@ -8,6 +8,7 @@
 
 -- Drop the old payment-gated INSERT policy
 DROP POLICY IF EXISTS "Applicants can upload documents after payment" ON storage.objects;
+DROP POLICY IF EXISTS "Applicants can upload own documents" ON storage.objects;
 
 -- New policy: uploads are allowed when the applicant has an active application
 -- (not rejected).  The API layer handles all further business-logic checks.
