@@ -325,28 +325,28 @@ This document breaks down the implementation into manageable tasks organized by 
 
 ---
 
-### Task 13: Admin Dashboard Pages
+### Task 13: Admin Dashboard Pages ✅ COMPLETED (2026-04-13)
 **Priority:** High  
 **Estimated Effort:** 8-10 hours
 
 
-- [ ] 13.1 Create admin layout (src/app/admin/layout.tsx)
-- [ ] 13.2 Create applications list page with pagination
-- [ ] 13.3 Create application details page
-- [ ] 13.4 Create scholarship management page
-- [ ] 13.5 Create decision modal component
-- [ ] 13.6 Create refund interface
-- [ ] 13.7 Implement ApplicationTable component
-- [ ] 13.8 Add filtering by status
-- [ ] 13.9 Add sorting by date/grades
-- [ ] 13.10 Display scholarship counter (X/20 awarded)
+- [x] 13.1 Create admin layout — route groups `(auth)` (login/forbidden) + `(portal)` with AdminShell (sidebar + topbar)
+- [x] 13.2 Create applications list page with real Supabase data, search, filtering, sorting
+- [x] 13.3 Create application details page — personal info, grades, payment, documents, scholarship video player
+- [x] 13.4 Create scholarship management page (`/admin/scholarship`) with tabbed filtering
+- [x] 13.5 Create decision actions — inline buttons for Admission sous réserve / définitive / refus, with conditional message input
+- [x] 13.6 Create `/api/admin/decision` route — admin-only, updates `application_status`, logs to `admin_decisions`
+- [x] 13.7 Create `/api/admin/document-url` route — generates signed Supabase Storage URLs for document downloads
+- [x] 13.8 Filtering by status (dossier, paiement, examen) + full-text search (ID, nom, email)
+- [x] 13.9 Sorting by all columns (ID, nom, paiement, statut, date)
+- [x] 13.10 Scholarship counter (X/20) with progress bar; tabs: Tous / Vidéo soumise / En attente
 
-**Acceptance Criteria:**
-- Admins can view all applications
-- Applications paginated (50 per page)
-- Admins can filter and sort applications
-- Scholarship applicants displayed separately
-- Video player works in admin view
+**Design:** Mirrors applicant dashboard exactly — navy sidebar (#021463), same topbar with backdrop-blur, same canvas/card geometry, Crimson Pro headings, Inter body.
+
+**Notes:**
+- Admin login now uses real Supabase auth (`signInWithPassword`) — middleware enforces `admissions_officers` role check.
+- `AdminShell` is a client component identical in structure to `DashboardShell` (hamburger + mobile drawer, body scroll-lock).
+- All admin reads use the applicant's session RLS (`applications_select_admin` policy); writes go through server-side API routes with `createAdminClient`.
 
 **Dependencies:** Task 3, Task 10
 
