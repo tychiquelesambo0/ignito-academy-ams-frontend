@@ -14,7 +14,8 @@
  */
 
 import { useRouter } from 'next/navigation'
-import { LogOut, Menu } from 'lucide-react'
+import Link from 'next/link'
+import { ClipboardList, LogOut, Menu } from 'lucide-react'
 import { useApplication } from '@/lib/context/ApplicationContext'
 import { createClient } from '@/lib/supabase/client'
 
@@ -38,6 +39,8 @@ export default function DashboardTopBar({ onMenuOpen }: Props) {
       : 'Candidat'
 
   const studentNumber = application?.applicant_id ?? null
+
+  const documentsActionRequired = Boolean(application?.conditional_message?.trim())
 
   const handleSignOut = async () => {
     const supabase = createClient()
@@ -64,6 +67,27 @@ export default function DashboardTopBar({ onMenuOpen }: Props) {
       >
         <Menu className="h-5 w-5" />
       </button>
+
+      {/* ── Demande de pièces complémentaires (visible sur toutes les pages) ── */}
+      {documentsActionRequired && (
+        <Link
+          href="/dashboard/documents"
+          aria-live="polite"
+          className="mx-1 flex min-h-12 min-w-0 flex-1 items-center justify-center gap-2
+                     rounded-md border border-amber-300 bg-amber-50 px-2 py-1.5
+                     text-amber-950 shadow-sm transition-colors
+                     hover:border-amber-400 hover:bg-amber-100 sm:mx-3 sm:justify-start sm:px-3
+                     lg:max-w-2xl"
+        >
+          <ClipboardList className="h-4 w-4 shrink-0 text-amber-800" aria-hidden />
+          <span className="min-w-0 truncate text-center text-[11px] font-bold leading-tight sm:text-left sm:text-xs">
+            <span className="sm:hidden">Documents requis par les admissions</span>
+            <span className="hidden sm:inline">
+              Le Bureau des admissions requiert des pièces complémentaires — ouvrir la page Documents
+            </span>
+          </span>
+        </Link>
+      )}
 
       {/* ── Right: user info — pushed to far right via ml-auto ──────────── */}
       <div className="ml-auto flex items-center gap-2 sm:gap-3">

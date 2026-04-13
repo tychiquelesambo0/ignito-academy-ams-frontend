@@ -22,7 +22,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Lock, CheckCircle2, X, Info } from 'lucide-react'
+import { Lock, CheckCircle2, X, Info, ClipboardList } from 'lucide-react'
 import { useApplicationSteps } from '@/lib/hooks/useApplicationSteps'
 import { useApplication } from '@/lib/context/ApplicationContext'
 
@@ -42,6 +42,8 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
     application?.payment_status === 'Waived'
   const scholarshipIneligible =
     paymentConfirmed && application?.is_scholarship_eligible === false
+
+  const documentsActionRequired = Boolean(application?.conditional_message?.trim())
 
   // Auto-close on mobile when the user navigates to a new page
   useEffect(() => {
@@ -112,12 +114,38 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
             Mon Dossier
           </p>
 
+          {documentsActionRequired && (
+            <div
+              className="mb-3 rounded-md border border-amber-400/35 bg-amber-500/15 px-3 py-2.5"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="flex items-start gap-2">
+                <ClipboardList className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-200" aria-hidden />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-amber-100/95">
+                    Pièces complémentaires requises
+                  </p>
+                  <Link
+                    href="/dashboard/documents"
+                    onClick={onClose}
+                    className="mt-1 block text-xs font-semibold leading-snug text-white underline-offset-2 hover:underline"
+                  >
+                    Ouvrir la page Documents pour téléverser les fichiers demandés
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
           <ul className="space-y-0.5">
             {steps.map((step) => {
               const active    = isActive(step.href, step.id)
               const locked    = !step.unlocked
               const completed = step.completed && !active
               const Icon      = step.icon
+              const docStepNeedsAction =
+                documentsActionRequired && step.id === 'documents' && step.unlocked
 
               // ── Locked item — not a link ──────────────────────────────────
               if (locked) {
@@ -181,6 +209,9 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
                       active
                         ? 'bg-[#4EA6F5]/15 text-[#4EA6F5]'
                         : 'text-white/60 hover:bg-white/8 hover:text-white',
+                      docStepNeedsAction
+                        ? 'ring-2 ring-amber-400/60 ring-offset-2 ring-offset-[#021463]'
+                        : '',
                     ].join(' ')}
                   >
                     {/* Active left accent bar */}
@@ -202,8 +233,17 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
 
                     <span className="flex-1 truncate">{step.label}</span>
 
+                    {docStepNeedsAction && (
+                      <span
+                        className="shrink-0 rounded border border-amber-300/50 bg-amber-500/25 px-1.5 py-0.5
+                                   text-[9px] font-bold uppercase tracking-wide text-amber-50"
+                      >
+                        Requis
+                      </span>
+                    )}
+
                     {/* Completed badge */}
-                    {completed && (
+                    {completed && !docStepNeedsAction && (
                       <CheckCircle2
                         className="h-3.5 w-3.5 shrink-0 text-[#10B981]/70"
                         aria-label="Étape complétée"

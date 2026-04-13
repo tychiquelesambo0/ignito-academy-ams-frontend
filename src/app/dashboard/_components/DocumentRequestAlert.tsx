@@ -22,6 +22,8 @@ export default function DocumentRequestAlert() {
     <div
       className="mb-6 overflow-hidden rounded-lg border-2 border-[#031463] bg-[#EFF6FF] shadow-sm"
       role="alert"
+      aria-live="polite"
+      aria-relevant="additions text"
     >
       <div className="border-b border-[#031463]/15 bg-[#031463] px-4 py-3 sm:px-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
