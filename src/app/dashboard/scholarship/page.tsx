@@ -389,15 +389,19 @@ export default function ScholarshipPage() {
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
 
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Session expirée. Veuillez vous reconnecter.')
+
+      // Filter by user_id to match the RLS policy (same pattern as all other forms).
       const { data: saved, error } = await supabase
         .from('applications')
         .update({ scholarship_video_url: videoUrl.trim() })
-        .eq('id', application.id)
+        .eq('user_id', user.id)
         .select('scholarship_video_url')
-        .single()
+        .maybeSingle()
 
       if (error) throw new Error(error.message)
-      if (!saved) throw new Error('La mise à jour n\'a pas été enregistrée. Veuillez réessayer.')
+      if (!saved) throw new Error('La mise à jour n\'a pas été enregistrée. Vérifiez votre session et réessayez.')
 
       // Flip the local flag immediately — the UI transitions to SubmittedView
       // without waiting for context propagation.
