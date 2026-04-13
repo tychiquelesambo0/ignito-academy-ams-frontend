@@ -4,16 +4,16 @@
  * Shell for the entire applicant dashboard.
  * Architecture:
  *   ApplicationProvider  ← single source of truth for auth + application data
- *     DashboardSidebar   ← fixed left, w-64, Navy #021463 (client — usePathname)
- *     DashboardTopBar    ← fixed top, backdrop-blur (client — useApplication)
- *     <main>             ← offset canvas, bg-slate-50
- *       {children}
+ *     DashboardShell     ← client wrapper that manages sidebar open/close state
+ *       DashboardSidebar ← slide-in drawer (mobile) / fixed (desktop)
+ *       DashboardTopBar  ← fixed top bar with hamburger (mobile) / offset (desktop)
+ *       <main>           ← full-width on mobile, ml-64 offset on desktop
+ *         {children}
  */
 
 import type { Metadata } from 'next'
 import { ApplicationProvider } from '@/lib/context/ApplicationContext'
-import DashboardSidebar from './_components/DashboardSidebar'
-import DashboardTopBar from './_components/DashboardTopBar'
+import DashboardShell from './_components/DashboardShell'
 
 export const metadata: Metadata = {
   title: 'Espace Candidat — Admitta',
@@ -27,18 +27,9 @@ export default function DashboardLayout({
 }) {
   return (
     <ApplicationProvider>
-      {/* Sidebar — fixed, always visible */}
-      <DashboardSidebar />
-
-      {/* Top bar — fixed, offset by sidebar width */}
-      <DashboardTopBar />
-
-      {/* Main content canvas */}
-      <main className="ml-64 min-h-screen bg-slate-50 pt-16">
-        <div className="mx-auto max-w-5xl px-6 py-8 md:px-8 md:py-10">
-          {children}
-        </div>
-      </main>
+      <DashboardShell>
+        {children}
+      </DashboardShell>
     </ApplicationProvider>
   )
 }
