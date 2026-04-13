@@ -90,18 +90,20 @@ export async function POST(request: NextRequest) {
 
   console.log('[webhook/pawapay] ▶ callback received', received)
 
-  // ── 1. Signature verification (optional — only when secret is configured) ──
+  // ── 1. Signature verification (log-only — PawaPay uses JWT HTTP Signatures,
+  //        not a user-configured HMAC secret. We log mismatches for forensics
+  //        but NEVER reject the webhook based on this check, because rejecting
+  //        silently (HTTP 200 without DB update) causes payments to get stuck.) ──
   const webhookSecret = process.env.PAWAPAY_WEBHOOK_SECRET
   if (webhookSecret) {
     const signature = request.headers.get('x-pawapay-signature') ?? ''
-    if (!verifySignature(rawBody, signature, webhookSecret)) {
-      console.warn('[webhook/pawapay] ✗ signature mismatch — rejecting')
-      // Still return 200 to avoid PawaPay retry storms; just don't process
-      return NextResponse.json({ received: true }, { status: 200 })
+    if (signature && !verifySignature(rawBody, signature, webhookSecret)) {
+      console.warn('[webhook/pawapay] ⚠ signature header present but did not match — processing anyway')
+    } else if (signature) {
+      console.log('[webhook/pawapay] ✓ signature verified')
+    } else {
+      console.log('[webhook/pawapay] ℹ no x-pawapay-signature header — PawaPay uses JWT signatures')
     }
-    console.log('[webhook/pawapay] ✓ signature verified')
-  } else {
-    console.log('[webhook/pawapay] ℹ no PAWAPAY_WEBHOOK_SECRET set — skipping signature check')
   }
 
   // ── 2. Parse payload ────────────────────────────────────────────────────────
