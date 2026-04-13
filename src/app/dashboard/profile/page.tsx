@@ -27,6 +27,7 @@ import Link from 'next/link'
 import { useApplication } from '@/lib/context/ApplicationContext'
 import { useApplicationSteps } from '@/lib/hooks/useApplicationSteps'
 import BackButton from '@/components/dashboard/BackButton'
+import SubmittedLockBanner from '@/components/dashboard/SubmittedLockBanner'
 
 // ─── DRC provinces (26 official provinces + Kinshasa) ─────────────────────────
 
@@ -96,9 +97,13 @@ function SectionHeader({
 // ─── Main page ─────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
-  const { refetch } = useApplication()
+  const { application, refetch } = useApplication()
   const steps       = useApplicationSteps()
   const nextStep    = steps.find((s) => s.id === 'academic-history')
+
+  const isLocked =
+    application?.payment_status === 'Confirmed' ||
+    application?.payment_status === 'Waived'
 
   const [pageLoading,    setPageLoading]    = useState(true)
   const [saving,         setSaving]         = useState(false)
@@ -321,8 +326,11 @@ export default function ProfilePage() {
         </p>
       </div>
 
+      {/* ── Lock banner — shown once payment is confirmed ── */}
+      {isLocked && <SubmittedLockBanner />}
+
       {/* ── Validation banner (fires when required fields are missing) ── */}
-      {validationMsg && (
+      {!isLocked && validationMsg && (
         <div className="flex items-start gap-3 rounded-lg border border-amber-200
                         bg-amber-50 px-4 py-3 animate-in fade-in duration-200">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
@@ -330,6 +338,8 @@ export default function ProfilePage() {
         </div>
       )}
 
+      {/* fieldset[disabled] disables every input/select/button inside when locked */}
+      <fieldset disabled={isLocked} className="contents">
       <form onSubmit={handleSubmit(onSubmit, onFormInvalid)} className="space-y-6" noValidate>
 
         {/* ── Section 1: Identité civile ─────────────────────────────────── */}
@@ -595,25 +605,28 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* ── Submit ────────────────────────────────────────────────────── */}
-        <button
-          type="submit"
-          disabled={saving}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-md
-                     bg-[#021463] text-sm font-semibold text-white transition-colors
-                     hover:bg-[#031a80] disabled:cursor-not-allowed disabled:opacity-60
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4EA6F5]"
-        >
-          {saving ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Enregistrement…
-            </>
-          ) : (
-            'Enregistrer les modifications'
-          )}
-        </button>
+        {/* ── Submit — hidden when dossier is sealed ──────────────────── */}
+        {!isLocked && (
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-md
+                       bg-[#021463] text-sm font-semibold text-white transition-colors
+                       hover:bg-[#031a80] disabled:cursor-not-allowed disabled:opacity-60
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4EA6F5]"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Enregistrement…
+              </>
+            ) : (
+              'Enregistrer les modifications'
+            )}
+          </button>
+        )}
       </form>
+      </fieldset>
     </div>
   )
 }

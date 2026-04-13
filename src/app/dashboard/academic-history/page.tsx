@@ -33,6 +33,7 @@ import { useApplication } from '@/lib/context/ApplicationContext'
 import { useApplicationSteps } from '@/lib/hooks/useApplicationSteps'
 import StepGate from '@/components/dashboard/StepGate'
 import BackButton from '@/components/dashboard/BackButton'
+import SubmittedLockBanner from '@/components/dashboard/SubmittedLockBanner'
 
 // CEFR level display labels (A1 = DB constraint value = UI value)
 const CEFR_LEVELS = [
@@ -45,9 +46,13 @@ const CEFR_LEVELS = [
 ] as const
 
 function AcademicHistoryForm() {
-  const { refetch } = useApplication()
+  const { application, refetch } = useApplication()
   const steps       = useApplicationSteps()
   const nextStep    = steps.find((s) => s.id === 'documents')
+
+  const isLocked =
+    application?.payment_status === 'Confirmed' ||
+    application?.payment_status === 'Waived'
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -212,6 +217,11 @@ function AcademicHistoryForm() {
         </p>
       </div>
 
+      {/* ── Lock banner — shown once payment is confirmed ── */}
+      {isLocked && <SubmittedLockBanner />}
+
+      {/* fieldset[disabled] disables every input/select/button inside when locked */}
+      <fieldset disabled={isLocked} className="contents">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
         {/* ── Section 1: École ── */}
@@ -444,23 +454,26 @@ function AcademicHistoryForm() {
           </div>
         )}
 
-        {/* ── Submit ── */}
-        <Button
-          type="submit"
-          disabled={saving}
-          className="h-12 w-full rounded-md bg-[#021463] text-white
-                     hover:bg-[#031a80] disabled:opacity-60"
-        >
-          {saving ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Enregistrement…
-            </>
-          ) : (
-            'Enregistrer les modifications'
-          )}
-        </Button>
+        {/* ── Submit — hidden when dossier is sealed ── */}
+        {!isLocked && (
+          <Button
+            type="submit"
+            disabled={saving}
+            className="h-12 w-full rounded-md bg-[#021463] text-white
+                       hover:bg-[#031a80] disabled:opacity-60"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Enregistrement…
+              </>
+            ) : (
+              'Enregistrer les modifications'
+            )}
+          </Button>
+        )}
       </form>
+      </fieldset>
     </div>
   )
 }
