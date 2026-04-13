@@ -46,6 +46,8 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger to automatically create applicant profile on user signup
+-- Idempotent: remote DBs may already have this trigger from a prior manual deploy.
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW
