@@ -145,6 +145,15 @@ export class PawaPayProvider implements IPaymentProvider {
       const depositId = crypto.randomUUID()
       console.log(`   Deposit ID: ${depositId} (${depositId.length} chars)`)
 
+      // MSISDN format: international number WITHOUT the leading '+' sign.
+      // PawaPay requires "243812345678", not "+243812345678".
+      const msisdn = request.phoneNumber.replace(/^\+/, '')
+      console.log(`   MSISDN (no +): ${msisdn}`)
+
+      // PawaPay enforces a 22-character max on statementDescription.
+      // Truncate and use a short, fixed label to avoid validation rejection.
+      const statementDescription = 'Ignito Academy Admiss.'  // exactly 22 chars
+
       // Prepare Pawa Pay deposit request
       const pawaPayRequest = {
         depositId,
@@ -154,11 +163,11 @@ export class PawaPayProvider implements IPaymentProvider {
         payer: {
           type: 'MSISDN',
           address: {
-            value: request.phoneNumber,
+            value: msisdn,
           },
         },
         customerTimestamp: new Date().toISOString(),
-        statementDescription: request.description,
+        statementDescription,
         metadata: [
           {
             fieldName: 'applicationId',
@@ -172,6 +181,7 @@ export class PawaPayProvider implements IPaymentProvider {
       }
 
       console.log('📤 Sending request to Pawa Pay API...')
+      console.log('📦 Full request payload:', JSON.stringify(pawaPayRequest, null, 2))
 
       // Call Pawa Pay API
       const response = await fetch(`${this.config.baseUrl}/deposits`, {
