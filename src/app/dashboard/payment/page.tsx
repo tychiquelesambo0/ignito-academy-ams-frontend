@@ -410,6 +410,29 @@ function PaymentForm() {
     }
   }, [applicant?.phone_number])
 
+  // ── On-load reconciliation ────────────────────────────────────────────────
+  // If the DB shows Pending when the page opens (e.g. the applicant paid but
+  // the webhook was missed), immediately call the status endpoint which will
+  // query PawaPay directly and auto-confirm if COMPLETED.
+  useEffect(() => {
+    if (
+      application?.applicant_id &&
+      application?.payment_status === 'Pending' &&
+      screenState === 'idle'
+    ) {
+      fetch(`/api/payment/status/${application.applicant_id}`)
+        .then((r) => r.json())
+        .then(async (data) => {
+          if (data.paymentStatus === 'Confirmed' || data.paymentStatus === 'Waived') {
+            await refetch()
+            // context update will trigger the AlreadyPaidView re-render
+          }
+        })
+        .catch(() => {/* non-fatal */})
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [application?.applicant_id, application?.payment_status])
+
   // ── Cleanup on unmount ───────────────────────────────────────────────────
   useEffect(() => {
     return () => {
