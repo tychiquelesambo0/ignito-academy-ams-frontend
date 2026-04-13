@@ -97,21 +97,69 @@ export const optionalTextFieldSchema = (maxLength: number = 255) =>
 // ============================================================================
 
 /**
- * Applicant profile schema
+ * Applicant profile schema — matches the live `applicants` table columns.
+ *
+ * Identity : prenom (required), postnom (optional), nom (required)
+ * Contact  : email (read-only), phoneNumber, dateNaissance
+ * Address  : adresseComplete (street), commune, ville, province, codePostal (opt)
  */
 export const profileSchema = z.object({
-  prenom: textFieldSchema('Le prénom', 100),
+  // ── Identity ────────────────────────────────────────────────────────────────
+  prenom:  textFieldSchema('Le prénom', 100),
+  postnom: z
+    .string()
+    .max(100, 'Le postnom ne peut pas dépasser 100 caractères')
+    .optional()
+    .or(z.literal('')),
   nom: textFieldSchema('Le nom', 100),
-  dateOfBirth: z.date({
-    required_error: 'La date de naissance est requise',
-    invalid_type_error: 'Date de naissance invalide',
-  }),
-  phoneNumber: phoneNumberSchema,
+
+  // ── Contact ─────────────────────────────────────────────────────────────────
   email: z
     .string()
-    .min(1, 'L\'email est requis')
+    .min(1, "L'email est requis")
     .email('Adresse email invalide'),
-  address: optionalTextFieldSchema(500),
+  phoneNumber: phoneNumberSchema,
+
+  // HTML <input type="date"> always gives a YYYY-MM-DD string, never a Date.
+  dateNaissance: z
+    .string()
+    .min(1, 'La date de naissance est requise')
+    .refine((v) => !isNaN(Date.parse(v)), 'Date de naissance invalide'),
+
+  // ── Address fields ────────────────────────────────────────────────────────────
+  // These are intentionally OPTIONAL in Zod so that updating phone / name never
+  // requires the address section to be filled first.  Completeness is enforced by
+  // useApplicationSteps: the profile step is only "complete" (unlocking the next
+  // step) once all four address fields are non-empty.  The UI still shows * to
+  // communicate that they are needed for progression.
+  adresseComplete: z
+    .string()
+    .max(255, "L'adresse ne peut pas dépasser 255 caractères")
+    .refine((v) => !v || !containsProhibitedKeyword(v), {
+      message: 'Le mot "OTHM" n\'est pas autorisé.',
+    })
+    .optional()
+    .or(z.literal('')),
+  commune: z
+    .string()
+    .max(100, 'La commune ne peut pas dépasser 100 caractères')
+    .optional()
+    .or(z.literal('')),
+  ville: z
+    .string()
+    .max(100, 'La ville ne peut pas dépasser 100 caractères')
+    .optional()
+    .or(z.literal('')),
+  province: z
+    .string()
+    .max(100, 'La province ne peut pas dépasser 100 caractères')
+    .optional()
+    .or(z.literal('')),
+  codePostal: z
+    .string()
+    .max(20, 'Le code postal ne peut pas dépasser 20 caractères')
+    .optional()
+    .or(z.literal('')),
 })
 
 export type ProfileFormData = z.infer<typeof profileSchema>
@@ -138,13 +186,15 @@ export const academicHistorySchema = z.object({
       required_error: 'L\'année de graduation est requise',
       invalid_type_error: 'L\'année doit être un nombre',
     })
-    .min(2024, 'L\'année de graduation doit être au minimum 2024')
+    .min(2000, 'L\'année de graduation doit être au minimum 2000')
     .max(2100, 'L\'année de graduation doit être au maximum 2100'),
   
-  // English proficiency (NOT used for scholarship eligibility)
+  // English proficiency — strict CEFR values matching DB constraint chk_english_level
+  // Values: A1 | A2 | B1 | B2 | C1 | C2 (NOT used for scholarship eligibility)
   englishProficiencyLevel: z
-    .enum(['beginner', 'intermediate', 'advanced', 'fluent'], {
+    .enum(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'], {
       required_error: 'Le niveau d\'anglais est requis',
+      message: 'Niveau CECRL invalide. Choisissez parmi A1, A2, B1, B2, C1 ou C2.',
     })
     .optional(),
 })

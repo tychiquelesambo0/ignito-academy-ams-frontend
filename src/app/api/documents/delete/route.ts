@@ -11,28 +11,26 @@ export async function DELETE(request: NextRequest) {
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-
     if (!user) {
       return NextResponse.json({ error: 'Vous devez être connecté' }, { status: 401 })
     }
 
-    // Use admin client for lookups — ownership is enforced by .eq('user_id') filters
     const admin = createAdminClient()
 
-    // Fetch the record first to verify ownership and get the storage path
+    // Fetch the record — enforce ownership via .eq('user_id')
     const { data: doc, error: fetchError } = await admin
       .from('uploaded_documents')
       .select('id, file_path, user_id, applicant_id')
       .eq('id', documentId)
-      .eq('user_id', user.id) // ownership check
+      .eq('user_id', user.id)
       .single()
 
     if (fetchError || !doc) {
       return NextResponse.json({ error: 'Document introuvable' }, { status: 404 })
     }
 
-    // Lock deletes once payment is confirmed — UNLESS admin has re-opened the
-    // window via Admission sous réserve status.
+    // Lock deletes once payment is confirmed — UNLESS admin re-opened via
+    // "Admission sous réserve".
     const { data: application } = await admin
       .from('applications')
       .select('payment_status, application_status')
@@ -42,22 +40,22 @@ export async function DELETE(request: NextRequest) {
     const isConditional = application?.application_status === 'Admission sous réserve'
     if (
       !isConditional &&
-      (application?.payment_status === 'Confirmed' || application?.payment_status === 'paid')
+      (application?.payment_status === 'Confirmed' || application?.payment_status === 'Waived')
     ) {
       return NextResponse.json(
         { error: 'Les documents sont verrouillés après confirmation du paiement.' },
-        { status: 403 }
+        { status: 403 },
       )
     }
 
-    // Remove from storage
-    const { error: storageError } = await supabase.storage
-      .from('documents')
+    // Remove from storage (admin client — same bucket fix: pieces_justificatives)
+    const { error: storageError } = await admin.storage
+      .from('pieces_justificatives')
       .remove([doc.file_path])
 
     if (storageError) {
-      console.error('Storage delete error:', storageError)
-      // Continue — still delete the DB record even if storage delete fails
+      // Log but continue — still delete the DB record so the slot can be re-used
+      console.error('[Documents/delete] storage error:', storageError)
     }
 
     // Delete DB record
@@ -67,13 +65,19 @@ export async function DELETE(request: NextRequest) {
       .eq('id', documentId)
 
     if (dbError) {
-      console.error('DB delete error:', dbError)
-      return NextResponse.json({ error: 'Erreur lors de la suppression du document' }, { status: 500 })
+      console.error('[Documents/delete] DB error:', dbError)
+      return NextResponse.json(
+        { error: 'Erreur lors de la suppression du document.' },
+        { status: 500 },
+      )
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Delete document error:', error)
-    return NextResponse.json({ error: "Une erreur inattendue s'est produite" }, { status: 500 })
+    console.error('[Documents/delete] unexpected error:', error)
+    return NextResponse.json(
+      { error: "Une erreur inattendue s'est produite." },
+      { status: 500 },
+    )
   }
 }

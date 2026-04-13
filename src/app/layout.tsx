@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Inter, Crimson_Pro } from "next/font/google"
 import "./globals.css"
 import { LanguageProvider } from "@/contexts/LanguageContext"
+import NavigationProgress from "@/components/NavigationProgress"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
         className={`${inter.variable} ${crimsonPro.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
+        <NavigationProgress />
         <LanguageProvider>
           {children}
         </LanguageProvider>

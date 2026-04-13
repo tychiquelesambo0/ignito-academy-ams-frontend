@@ -15,9 +15,9 @@ export type Currency = 'USD'
 
 /**
  * Application fee in USD
- * FIXED at 29 USD - this cannot be changed
+ * TEMPORARY: set to 1 USD for live transaction testing — restore to 29 before launch
  */
-export const APPLICATION_FEE_USD = 29
+export const APPLICATION_FEE_USD = 1
 
 /**
  * Validate that currency is USD
@@ -41,7 +41,7 @@ export function validateCurrency(currency: string): asserts currency is Currency
  * 
  * @param amountUsd - Amount in USD to validate
  * @param currency - Currency (must be USD)
- * @throws Error if amount is not exactly 29 USD or currency is not USD
+ * @throws Error if amount does not match APPLICATION_FEE_USD or currency is not USD
  */
 export function validatePaymentAmount(amountUsd: number, currency: string): void {
   // First validate currency

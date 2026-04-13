@@ -48,7 +48,6 @@ export async function POST(req: NextRequest) {
       prenom,
       nom,
       date_naissance,
-      password_hash: '',
     }, { onConflict: 'id' })
 
     if (profileError) {
@@ -78,13 +77,11 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Create application record
+    // exam_status defaults to 'En attente' per the live schema enum
     const { error: appError } = await admin.from('applications').insert({
       applicant_id: applicantId as string,
       user_id: userId,
       intake_year: currentYear,
-      ecole_provenance: '',
-      option_academique: '',
-      exam_status: 'En attente des résultats',
       application_status: 'Dossier Créé',
       payment_status: 'Pending',
     })
