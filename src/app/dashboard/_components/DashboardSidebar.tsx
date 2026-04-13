@@ -128,7 +128,7 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
                 let expandedMsg: string | null = null
                 if (isScholarshipStep && scholarshipIneligible) {
                   expandedMsg =
-                    "Votre dossier académique ne remplit pas les critères requis : moyenne ≥ 70 % en Terminale et à l'EXETAT."
+                    'Non éligible à la bourse. Votre dossier académique ne remplit pas les critères requis.'
                 } else if (isScholarshipStep) {
                   expandedMsg =
                     'Finalisez votre paiement des frais de dossier pour débloquer cette étape.'
