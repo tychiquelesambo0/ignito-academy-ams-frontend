@@ -50,6 +50,8 @@ interface Application {
   scholarship_video_url:   string | null
   documents_submitted:     boolean
   user_id:                 string
+  // catch-all for any extra DB columns
+  [key: string]:           unknown
 }
 
 interface UploadedDoc {
@@ -244,15 +246,7 @@ export default function ApplicationDetailPage() {
 
     const { data: appData, error: appErr } = await supabase
       .from('applications')
-      .select(`
-        applicant_id, intake_year, ecole_provenance, option_academique,
-        exam_status, application_status, payment_status,
-        transaction_id, payment_confirmed_at, conditional_message,
-        created_at, updated_at, graduation_year,
-        grade_10_average, grade_11_average, grade_12_average,
-        exetat_percentage, is_scholarship_eligible, scholarship_video_url,
-        documents_submitted, user_id
-      `)
+      .select('*')
       .eq('applicant_id', applicantId)
       .maybeSingle()
 
@@ -278,12 +272,12 @@ export default function ApplicationDetailPage() {
     setApplication(appData as Application)
     setCondMessage(appData.conditional_message ?? '')
 
-    // Applicant profile
+    // Applicant profile — select * to survive any schema differences
     const { data: applicantData } = await supabase
       .from('applicants')
-      .select('prenom, nom, postnom, email, phone_number, date_naissance, adresse_rue, adresse_ville, province')
+      .select('*')
       .eq('id', appData.user_id)
-      .single()
+      .maybeSingle()
 
     if (applicantData) setApplicant(applicantData as Applicant)
 
