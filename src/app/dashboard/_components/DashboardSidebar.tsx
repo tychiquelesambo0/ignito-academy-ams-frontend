@@ -22,7 +22,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Lock, CheckCircle2, X } from 'lucide-react'
+import { Lock, CheckCircle2, X, Info } from 'lucide-react'
 import { useApplicationSteps } from '@/lib/hooks/useApplicationSteps'
 import { useApplication } from '@/lib/context/ApplicationContext'
 
@@ -33,8 +33,15 @@ interface Props {
 
 export default function DashboardSidebar({ isOpen, onClose }: Props) {
   const pathname = usePathname()
-  const { loading } = useApplication()
+  const { loading, application } = useApplication()
   const steps = useApplicationSteps()
+
+  // Derive scholarship-specific lock reason for the tooltip
+  const paymentConfirmed =
+    application?.payment_status === 'Confirmed' ||
+    application?.payment_status === 'Waived'
+  const scholarshipIneligible =
+    paymentConfirmed && application?.is_scholarship_eligible === false
 
   // Auto-close on mobile when the user navigates to a new page
   useEffect(() => {
@@ -114,19 +121,64 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
 
               // ── Locked item — not a link ──────────────────────────────────
               if (locked) {
+                // Build the tooltip message. For the scholarship step we give a
+                // specific explanation so the applicant understands why it's locked.
+                const isScholarshipStep = step.id === 'scholarship'
+                let tooltipTitle: string
+                let tooltipBody: string | null = null
+
+                if (isScholarshipStep && scholarshipIneligible) {
+                  tooltipTitle = 'Non éligible à la bourse'
+                  tooltipBody =
+                    'Votre dossier académique ne remplit pas les critères requis (moyenne ≥ 70 % en Terminale et à l\'EXETAT).'
+                } else if (isScholarshipStep) {
+                  tooltipTitle = 'Bourse d\'Excellence verrouillée'
+                  tooltipBody = 'Finalisez votre paiement pour débloquer cette étape.'
+                } else {
+                  tooltipTitle = `Complétez « ${step.prerequisiteLabel} » d'abord`
+                }
+
                 return (
-                  <li key={step.id}>
+                  <li key={step.id} className="group/locked relative">
                     <span
                       aria-disabled="true"
-                      title={`Complétez "${step.prerequisiteLabel}" pour déverrouiller`}
                       className="flex min-h-[48px] cursor-not-allowed items-center gap-3
                                  rounded-md px-3 py-2.5 text-sm font-medium
                                  text-white/25 select-none"
                     >
                       <Icon className="h-4 w-4 shrink-0 text-white/20" />
                       <span className="flex-1 truncate">{step.label}</span>
-                      <Lock className="h-3 w-3 shrink-0 text-white/20" />
+                      {/* Info icon for scholarship ineligible, lock icon for other steps */}
+                      {isScholarshipStep && scholarshipIneligible
+                        ? <Info className="h-3.5 w-3.5 shrink-0 text-white/30" />
+                        : <Lock className="h-3 w-3 shrink-0 text-white/20" />
+                      }
                     </span>
+
+                    {/* ── Custom tooltip — appears to the right on hover ── */}
+                    <div
+                      role="tooltip"
+                      className="pointer-events-none absolute left-full top-1/2 z-50 ml-3
+                                 w-56 -translate-y-1/2 rounded-lg bg-slate-900 px-3.5 py-3
+                                 shadow-xl opacity-0 transition-opacity duration-150
+                                 group-hover/locked:opacity-100
+                                 lg:block hidden"
+                    >
+                      {/* Arrow pointing left */}
+                      <span
+                        aria-hidden="true"
+                        className="absolute -left-1.5 top-1/2 h-3 w-3 -translate-y-1/2
+                                   rotate-45 rounded-sm bg-slate-900"
+                      />
+                      <p className="relative text-xs font-semibold text-white leading-snug">
+                        {tooltipTitle}
+                      </p>
+                      {tooltipBody && (
+                        <p className="relative mt-1 text-[11px] leading-relaxed text-slate-400">
+                          {tooltipBody}
+                        </p>
+                      )}
+                    </div>
                   </li>
                 )
               }
