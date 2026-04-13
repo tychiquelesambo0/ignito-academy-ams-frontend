@@ -62,6 +62,15 @@ export async function POST(req: NextRequest) {
     // ── 3. Apply the decision using the admin (service-role) client ──────────
     const admin = createAdminClient()
 
+    // Fetch previous status first for the audit trail
+    const { data: current } = await admin
+      .from('applications')
+      .select('application_status')
+      .eq('applicant_id', applicantId)
+      .single()
+
+    const previousStatus = current?.application_status ?? null
+
     const updatePayload: Record<string, unknown> = {
       application_status: status,
       updated_at:         new Date().toISOString(),
@@ -88,14 +97,15 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // ── 4. Log the decision in admin_decisions ───────────────────────────────
+    // ── 4. Log the decision in audit_trail ──────────────────────────────────
     await admin
-      .from('admin_decisions')
+      .from('audit_trail')
       .insert({
-        application_id: applicantId,
-        admin_id:       user.id,
-        decision_type:  status,
-        notes:          conditionalMessage?.trim() ?? null,
+        applicant_id:    applicantId,
+        admin_id:        user.id,
+        previous_status: previousStatus as any,
+        new_status:      status as any,
+        notes:           conditionalMessage?.trim() ?? null,
       })
       .then() // fire-and-forget; don't fail the request if this errors
 
