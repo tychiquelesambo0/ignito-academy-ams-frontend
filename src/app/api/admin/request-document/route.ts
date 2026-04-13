@@ -42,14 +42,31 @@ export async function POST(req: NextRequest) {
     // ── 3. Update application — set conditional message ──────────────────────
     const admin = createAdminClient()
 
-    // Fetch previous status for audit trail
-    const { data: current } = await admin
+    const { data: current, error: fetchErr } = await admin
       .from('applications')
       .select('application_status')
       .eq('applicant_id', applicantId)
-      .single()
+      .maybeSingle()
 
-    const { data: updated, error } = await admin
+    if (fetchErr) {
+      console.error('[admin/request-document] fetch error:', fetchErr)
+      return NextResponse.json(
+        {
+          error:   'Impossible de charger le dossier.',
+          details: fetchErr.message,
+        },
+        { status: 500 },
+      )
+    }
+
+    if (!current) {
+      return NextResponse.json(
+        { error: 'Aucun dossier ne correspond à cet identifiant candidat.' },
+        { status: 404 },
+      )
+    }
+
+    const { data: updatedRows, error } = await admin
       .from('applications')
       .update({
         conditional_message: message.trim(),
@@ -57,15 +74,26 @@ export async function POST(req: NextRequest) {
       })
       .eq('applicant_id', applicantId)
       .select('applicant_id, conditional_message')
-      .single()
 
-    if (error || !updated) {
+    if (error) {
       console.error('[admin/request-document] update error:', error)
       return NextResponse.json(
-        { error: 'Impossible d\'envoyer la demande de document.' },
-        { status: 500 }
+        {
+          error:   'Impossible d\'enregistrer la demande de document.',
+          details: error.message,
+        },
+        { status: 500 },
       )
     }
+
+    if (!updatedRows?.length) {
+      return NextResponse.json(
+        { error: 'Aucune ligne n\'a été mise à jour. Vérifiez l\'identifiant du dossier.' },
+        { status: 404 },
+      )
+    }
+
+    const updated = updatedRows[0]
 
     // ── 4. Log in audit_trail ────────────────────────────────────────────────
     await admin

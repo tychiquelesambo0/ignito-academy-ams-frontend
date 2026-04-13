@@ -402,7 +402,11 @@ export default function ApplicationDetailPage() {
     setRequestingDoc(false)
 
     if (!res.ok || !json.success) {
-      setDocRequestError(json.error ?? 'Impossible d\'envoyer la demande.')
+      const base = json.error ?? 'Impossible d\'envoyer la demande.'
+      const hint = typeof json.details === 'string' && json.details.trim()
+        ? ` — ${json.details}`
+        : ''
+      setDocRequestError(base + hint)
       return
     }
 
