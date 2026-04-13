@@ -44,6 +44,7 @@ const ADMISSION_FEE_USD = 1 // TEMP: restore to 29 before launch
 
 type ProviderOption = 'M-Pesa' | 'Orange Money' | 'Airtel Money'
 type PaymentScreenState = 'idle' | 'processing' | 'awaiting' | 'confirmed' | 'failed'
+type PaymentMode = 'simulation' | 'sandbox' | 'production' | null
 const POLL_INTERVAL_MS = 3_000
 const AWAIT_TIMEOUT_S  = 300 // 5 minutes
 
@@ -396,6 +397,7 @@ function PaymentForm() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [transactionId, setTransactionId] = useState<string | null>(null)
   const [awaitingSeconds, setAwaitingSeconds] = useState(AWAIT_TIMEOUT_S)
+  const [paymentMode, setPaymentMode] = useState<PaymentMode>(null)
 
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const pollStartRef    = useRef<number>(0)
@@ -487,13 +489,14 @@ function PaymentForm() {
       }
 
       setTransactionId(data.transactionId ?? null)
+      setPaymentMode(data.mode ?? null)
 
       if (data.status === 'Confirmed') {
-        // Mock mode — immediate confirmation
+        // Mock / immediate confirmation
         setScreenState('confirmed')
         await refetch()
       } else {
-        // PawaPay live mode — show USSD waiting screen and poll
+        // PawaPay live — show USSD waiting screen and poll
         setAwaitingSeconds(AWAIT_TIMEOUT_S)
         setScreenState('awaiting')
         startPolling(application.applicant_id)
@@ -548,6 +551,14 @@ function PaymentForm() {
             Frais d'inscription — {ADMISSION_FEE_USD} USD
           </p>
         </header>
+        {paymentMode === 'simulation' && (
+          <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3.5 py-2.5">
+            <Info className="h-3.5 w-3.5 shrink-0 text-amber-500" />
+            <p className="text-xs text-amber-700">
+              Paiement simulé — aucune transaction réelle n'a été effectuée.
+            </p>
+          </div>
+        )}
         <ConfirmedView
           transactionId={transactionId}
           onGoToDashboard={() => router.push('/dashboard')}
@@ -594,6 +605,37 @@ function PaymentForm() {
           Réglez les frais d'inscription pour finaliser votre dossier de candidature.
         </p>
       </header>
+
+      {/* ── Mode badge ───────────────────────────────────────────────────── */}
+      {paymentMode === 'simulation' && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3.5">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+          <div>
+            <p className="text-sm font-semibold text-amber-700">Mode simulation activé</p>
+            <p className="text-xs text-amber-600 mt-0.5 leading-relaxed">
+              Les variables d'environnement PawaPay ne sont pas configurées sur ce serveur.
+              Le paiement sera confirmé instantanément sans transaction réelle.
+              Pour activer les paiements réels, ajoutez{' '}
+              <span className="font-mono">PAYMENT_PROVIDER=pawapay</span> et les clés PawaPay
+              dans les variables d'environnement de votre déploiement.
+            </p>
+          </div>
+        </div>
+      )}
+      {paymentMode === 'sandbox' && (
+        <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3.5">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+          <div>
+            <p className="text-sm font-semibold text-blue-700">Mode sandbox PawaPay</p>
+            <p className="text-xs text-blue-600 mt-0.5 leading-relaxed">
+              Connecté à l'environnement sandbox de PawaPay. Les numéros réels ne reçoivent
+              pas de notification en sandbox. Utilisez les numéros de test PawaPay, ou
+              changez <span className="font-mono">PAWAPAY_BASE_URL</span> vers{' '}
+              <span className="font-mono">https://api.pawapay.io</span> pour les transactions réelles.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ── Error banner ─────────────────────────────────────────────────── */}
       {errorMsg && (

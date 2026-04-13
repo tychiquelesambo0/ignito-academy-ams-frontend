@@ -107,14 +107,15 @@ export class PawaPayProvider implements IPaymentProvider {
   }
 
   /**
-   * Convert USD amount to minor units (cents)
-   * Task 6.4: Convert amount to minor units
-   * 
-   * Pawa Pay requires amounts in minor units (cents for USD)
-   * Example: $29.00 → "2900"
+   * Format USD amount as a decimal string for the PawaPay API.
+   *
+   * IMPORTANT: PawaPay does NOT use minor units (cents).
+   * The `amount` field must be the full decimal value as a string.
+   * Example: $1.00 → "1.00"   $29.00 → "29.00"
+   * Sending "100" instead of "1.00" would attempt a $100 charge.
    */
-  private toMinorUnits(amountUsd: number): string {
-    return Math.round(amountUsd * 100).toString()
+  private toAmountString(amountUsd: number): string {
+    return amountUsd.toFixed(2)
   }
 
   /**
@@ -136,9 +137,9 @@ export class PawaPayProvider implements IPaymentProvider {
       const correspondent = this.detectCorrespondent(request.phoneNumber)
       console.log(`   Detected Provider: ${correspondent}`)
 
-      // Convert amount to minor units
-      const amountMinorUnits = this.toMinorUnits(request.amountUsd)
-      console.log(`   Amount (minor units): ${amountMinorUnits} cents`)
+      // Format amount as full decimal string (PawaPay does NOT use minor units)
+      const amountMinorUnits = this.toAmountString(request.amountUsd)
+      console.log(`   Amount (decimal string): ${amountMinorUnits} USD`)
 
       // Generate unique deposit ID (UUID v4 format - exactly 36 characters)
       const depositId = crypto.randomUUID()
@@ -371,8 +372,8 @@ export class PawaPayProvider implements IPaymentProvider {
 
     const data: PawaPayDepositResponse = JSON.parse(payload)
 
-    // Convert amount from minor units back to USD
-    const amountUsd = parseInt(data.amount) / 100
+    // PawaPay sends the full decimal amount (NOT minor units)
+    const amountUsd = parseFloat(data.amount)
 
     const webhookData: WebhookPayload = {
       transactionId: data.depositId,

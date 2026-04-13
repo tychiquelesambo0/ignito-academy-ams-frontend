@@ -99,9 +99,11 @@ export async function POST(request: NextRequest) {
 
     // ── Payment provider (factory: 'mock' or 'pawapay') ────────────────────
     const paymentProvider = await getPaymentProvider()
-    const isMock = paymentProvider.name === 'Mock Payment Provider'
+    const isMock     = paymentProvider.name === 'Mock Payment Provider'
+    const isSandbox  = (process.env.PAWAPAY_BASE_URL ?? '').includes('sandbox')
+    const activeMode = isMock ? 'simulation' : isSandbox ? 'sandbox' : 'production'
 
-    console.log(`[payment/initiate] Provider: ${paymentProvider.name} | Applicant: ${applicantId}`)
+    console.log(`[payment/initiate] Mode: ${activeMode} | Provider: ${paymentProvider.name} | Applicant: ${applicantId}`)
 
     // ── Initiate payment ───────────────────────────────────────────────────
     const result = await paymentProvider.initiatePayment({
@@ -170,7 +172,7 @@ export async function POST(request: NextRequest) {
         success: true,
         status: 'Confirmed',
         transactionId: result.transactionId,
-        mock: isMock,
+        mode: activeMode,
       })
     } else {
       // PawaPay async path: store transaction_id, set Pending
@@ -192,7 +194,7 @@ export async function POST(request: NextRequest) {
         success: true,
         status: 'Pending',
         transactionId: result.transactionId,
-        mock: false,
+        mode: activeMode,
       })
     }
   } catch (error) {
