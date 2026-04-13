@@ -81,6 +81,9 @@ export interface Application {
   // Document submission gate (set to true on the Documents page before payment)
   documents_submitted: boolean
 
+  /** Message from admissions (demande de pièce complémentaire, admission sous réserve, etc.) */
+  conditional_message: string | null
+
   // Optimistic locking
   version: number
 

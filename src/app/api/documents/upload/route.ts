@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
+import {
+  isDocumentLocked,
+  type ApplicationStatus,
+  type PaymentStatus,
+} from '@/lib/status-machine'
 
 const MAX_FILE_SIZE = 5_242_880 // 5 MB
 const ACCEPTED_MIME_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
@@ -49,7 +54,7 @@ export async function POST(request: NextRequest) {
     const admin = createAdminClient()
     const { data: application, error: appError } = await admin
       .from('applications')
-      .select('id, applicant_id, payment_status, application_status, intake_year')
+      .select('id, applicant_id, payment_status, application_status, intake_year, conditional_message')
       .eq('applicant_id', applicantId)
       .eq('user_id', user.id)
       .single()
@@ -61,12 +66,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Documents are locked once payment is confirmed — UNLESS admin has re-opened
-    // the window via "Admission sous réserve".
-    const isConditional = application.application_status === 'Admission sous réserve'
+    // Locked after payment unless admission sous réserve OR demande de pièce (conditional_message).
     if (
-      !isConditional &&
-      (application.payment_status === 'Confirmed' || application.payment_status === 'Waived')
+      isDocumentLocked(
+        application.application_status as ApplicationStatus,
+        application.payment_status as PaymentStatus,
+        application.conditional_message,
+      )
     ) {
       return NextResponse.json(
         { error: 'Les documents sont verrouillés après confirmation du paiement.' },

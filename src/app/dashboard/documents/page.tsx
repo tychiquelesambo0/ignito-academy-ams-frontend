@@ -8,7 +8,8 @@
  *
  * Gate: unlocked only after academic history is saved (useApplicationSteps).
  * Submit: sets applications.documents_submitted = true → unlocks Payment step.
- * Lock: documents become read-only once payment_status is Confirmed or Waived.
+ * Lock: documents become read-only once payment_status is Confirmed or Waived,
+ *       unless « Admission sous réserve » or conditional_message (demande complémentaire).
  *
  * Accepted formats: PDF, JPG, PNG — max 5 MB per file (enforced client + server + DB).
  * NO video uploads (architecture pillar).
@@ -19,6 +20,11 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useApplication } from '@/lib/context/ApplicationContext'
 import { useApplicationSteps } from '@/lib/hooks/useApplicationSteps'
+import {
+  isDocumentLocked,
+  type ApplicationStatus,
+  type PaymentStatus,
+} from '@/lib/status-machine'
 import StepGate from '@/components/dashboard/StepGate'
 import BackButton from '@/components/dashboard/BackButton'
 import {
@@ -389,9 +395,19 @@ function DocumentsForm() {
 
   const applicantId      = application?.applicant_id ?? ''
   const alreadySubmitted = application?.documents_submitted === true
-  const isLocked         =
-    application?.payment_status === 'Confirmed' ||
-    application?.payment_status === 'Waived'
+  const isLocked = application
+    ? isDocumentLocked(
+        application.application_status as ApplicationStatus,
+        application.payment_status as PaymentStatus,
+        application.conditional_message,
+      )
+    : true
+
+  const supplementWindow =
+    !!application &&
+    !isLocked &&
+    (Boolean(application.conditional_message?.trim()) ||
+      application.application_status === 'Admission sous réserve')
 
   const requiredTypes    = REQUIRED_DOCS.map((d) => d.type)
   const requiredUploaded = requiredTypes.filter((t) => slots[t] != null).length
@@ -509,6 +525,27 @@ function DocumentsForm() {
         </p>
       </div>
 
+      {/* Demande de pièces complémentaires (admin) ou admission sous réserve */}
+      {supplementWindow && (
+        <div className="mb-6 rounded-lg border border-[#4EA6F5]/30 bg-[#EFF6FF] p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#021463]">
+            {application?.application_status === 'Admission sous réserve'
+              ? 'Admission sous réserve'
+              : 'Demande du service des admissions'}
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-slate-800">
+            {application?.conditional_message?.trim()
+              ? application.conditional_message
+              : 'Des pièces complémentaires sont requises pour finaliser votre dossier. Veuillez les téléverser ci-dessous.'}
+          </p>
+          <p className="mt-3 text-xs leading-relaxed text-slate-600">
+            Les téléversements sont déverrouillés. Utilisez les cases ci-dessous pour déposer les
+            fichiers demandés. Si la pièce ne correspond à aucune catégorie obligatoire ou
+            optionnelle, utilisez «&nbsp;Document supplémentaire&nbsp;».
+          </p>
+        </div>
+      )}
+
       {/* Progress banner */}
       <div
         className={`mb-6 rounded-lg border p-4 ${
@@ -610,8 +647,25 @@ function DocumentsForm() {
             <div>
               <p className="text-sm font-semibold text-slate-700">Documents verrouillés</p>
               <p className="mt-0.5 text-xs text-slate-500">
-                Vos documents ne peuvent plus être modifiés après confirmation du paiement.
+                Vos documents ne peuvent plus être modifiés après confirmation du paiement, sauf si
+                le service des admissions vous demande des pièces complémentaires.
               </p>
+            </div>
+          </div>
+        ) : alreadySubmitted && supplementWindow ? (
+          <div className="rounded-lg border border-[#4EA6F5]/25 bg-[#F8FAFC] p-5">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#4EA6F5]" />
+              <div>
+                <p className="text-sm font-semibold text-slate-800">
+                  Dépôt de pièces complémentaires
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-600">
+                  Votre dossier principal est déjà transmis. Téléversez les fichiers demandés dans
+                  les sections ci-dessus ; le comité pourra les consulter lors de la prochaine
+                  vérification.
+                </p>
+              </div>
             </div>
           </div>
         ) : alreadySubmitted ? (

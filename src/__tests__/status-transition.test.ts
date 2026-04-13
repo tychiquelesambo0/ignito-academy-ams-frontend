@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
+import { isDocumentLocked } from '@/lib/status-machine'
 
 // ─── Status transition model ──────────────────────────────────────────────────
 
@@ -191,13 +192,6 @@ describe('Status transition — applicant resubmission (conditional loop)', () =
 })
 
 describe('Status transition — document lock/unlock rules', () => {
-
-  function isDocumentLocked(status: ApplicationStatus, paymentStatus: PaymentStatus): boolean {
-    const isPaid = paymentStatus === 'paid' || paymentStatus === 'Confirmed'
-    const isConditional = status === 'Admission sous réserve'
-    return isPaid && !isConditional
-  }
-
   it('documents are unlocked before payment', () => {
     expect(isDocumentLocked('Dossier Créé', 'Pending')).toBe(false)
   })

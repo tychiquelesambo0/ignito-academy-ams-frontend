@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
+import {
+  isDocumentLocked,
+  type ApplicationStatus,
+  type PaymentStatus,
+} from '@/lib/status-machine'
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -33,14 +38,20 @@ export async function DELETE(request: NextRequest) {
     // "Admission sous réserve".
     const { data: application } = await admin
       .from('applications')
-      .select('payment_status, application_status')
+      .select('payment_status, application_status, conditional_message')
       .eq('applicant_id', doc.applicant_id)
       .single()
 
-    const isConditional = application?.application_status === 'Admission sous réserve'
+    if (!application) {
+      return NextResponse.json({ error: 'Dossier de candidature introuvable.' }, { status: 404 })
+    }
+
     if (
-      !isConditional &&
-      (application?.payment_status === 'Confirmed' || application?.payment_status === 'Waived')
+      isDocumentLocked(
+        application.application_status as ApplicationStatus,
+        application.payment_status as PaymentStatus,
+        application.conditional_message,
+      )
     ) {
       return NextResponse.json(
         { error: 'Les documents sont verrouillés après confirmation du paiement.' },

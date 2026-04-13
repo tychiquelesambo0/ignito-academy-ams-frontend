@@ -21,7 +21,7 @@ export type ApplicationStatus =
   | 'Admission définitive'
   | 'Dossier refusé'
 
-export type PaymentStatus = 'Pending' | 'paid' | 'Confirmed' | 'Failed'
+export type PaymentStatus = 'Pending' | 'paid' | 'Confirmed' | 'Failed' | 'Waived'
 
 export const TERMINAL_STATUSES: ApplicationStatus[] = [
   'Admission définitive',
@@ -78,18 +78,26 @@ export function canApplicantResubmit(
   paymentStatus: PaymentStatus,
 ): boolean {
   return status === 'Admission sous réserve'
-      && (paymentStatus === 'paid' || paymentStatus === 'Confirmed')
+      && (paymentStatus === 'paid' || paymentStatus === 'Confirmed' || paymentStatus === 'Waived')
 }
 
 /**
  * Returns true if the applicant's documents are locked (cannot be changed/deleted).
- * Documents are locked after payment UNLESS the applicant is in conditional admission.
+ * Documents are locked after payment UNLESS:
+ *  - status is « Admission sous réserve », or
+ *  - the admissions team set `conditional_message` (demande de pièce complémentaire).
  */
 export function isDocumentLocked(
-  status:        ApplicationStatus,
-  paymentStatus: PaymentStatus,
+  status:               ApplicationStatus,
+  paymentStatus:      PaymentStatus,
+  conditionalMessage?: string | null,
 ): boolean {
-  const paymentConfirmed = paymentStatus === 'paid' || paymentStatus === 'Confirmed'
-  const inConditional    = status === 'Admission sous réserve'
-  return paymentConfirmed && !inConditional
+  const paymentConfirmed =
+    paymentStatus === 'paid' ||
+    paymentStatus === 'Confirmed' ||
+    paymentStatus === 'Waived'
+  const uploadReopened =
+    status === 'Admission sous réserve' ||
+    Boolean(conditionalMessage?.trim())
+  return paymentConfirmed && !uploadReopened
 }

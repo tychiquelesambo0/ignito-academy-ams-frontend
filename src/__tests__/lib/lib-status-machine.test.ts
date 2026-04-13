@@ -157,4 +157,15 @@ describe('isDocumentLocked', () => {
   it('unlocks documents when payment failed', () => {
     expect(isDocumentLocked('en_cours_devaluation', 'Failed')).toBe(false)
   })
+
+  it('locks documents when payment is Waived and no supplement window', () => {
+    expect(isDocumentLocked('en_cours_devaluation', 'Waived')).toBe(true)
+  })
+
+  it('unlocks documents when admissions set conditional_message (demande complémentaire)', () => {
+    expect(isDocumentLocked('en_cours_devaluation', 'Confirmed', 'Veuillez envoyer votre EXETAT.')).toBe(
+      false,
+    )
+    expect(isDocumentLocked('en_cours_devaluation', 'Waived', 'Pièce manquante')).toBe(false)
+  })
 })
