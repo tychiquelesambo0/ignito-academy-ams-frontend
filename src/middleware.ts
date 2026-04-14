@@ -56,15 +56,15 @@ export async function middleware(request: NextRequest) {
     await supabase.auth.signOut()
     const redirectUrl = request.nextUrl.pathname.startsWith('/admin')
       ? '/admin/login'
-      : '/apply'
+      : '/apply?tab=connexion'
     return NextResponse.redirect(new URL(redirectUrl, request.url))
   }
 
   // ── Applicant dashboard ──────────────────────────────────────────────────
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
     if (!user) {
-      console.log('[Middleware] No user found, redirecting to /apply')
-      return NextResponse.redirect(new URL('/apply', request.url))
+      console.log('[Middleware] No user found, redirecting to /apply?tab=connexion')
+      return NextResponse.redirect(new URL('/apply?tab=connexion', request.url))
     }
 
     console.log('[Middleware] User authenticated:', user.id, user.email)
@@ -81,7 +81,7 @@ export async function middleware(request: NextRequest) {
     if (!applicant) {
       console.log('[Middleware] No applicant record found, signing out and redirecting')
       await supabase.auth.signOut()
-      return NextResponse.redirect(new URL('/apply', request.url))
+      return NextResponse.redirect(new URL('/apply?tab=connexion', request.url))
     }
 
     console.log('[Middleware] Applicant verified, allowing access to dashboard')

@@ -30,6 +30,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { sendEmailWithRetry } from '@/lib/email/send-with-retry'
 import { paymentConfirmationEmail } from '@/lib/email/templates'
+import { APPLICATION_FEE_USD } from '@/lib/payment/currency'
 
 // ─── PawaPay callback payload types ───────────────────────────────────────────
 
@@ -193,7 +194,7 @@ export async function POST(request: NextRequest) {
         prenom:      applicant.prenom,
         nom:         applicant.nom,
         applicantId: application.applicant_id,
-        amount:      `${amount} ${currency}`,
+        amount:      `${APPLICATION_FEE_USD} USD`,
         date:        received,
       })
       sendEmailWithRetry({

@@ -14,10 +14,9 @@
 export type Currency = 'USD'
 
 /**
- * Application fee in USD
- * TEMPORARY: set to 1 USD for live transaction testing — restore to 29 before launch
+ * Application fee in USD — 29 USD (non-negotiable, production value)
  */
-export const APPLICATION_FEE_USD = 1
+export const APPLICATION_FEE_USD = 29
 
 /**
  * Validate that currency is USD

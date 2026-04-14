@@ -408,6 +408,20 @@ export default function ScholarshipPage() {
       setSubmittedUrl(saved.scholarship_video_url ?? videoUrl.trim())
       setJustSubmitted(true)
 
+      // Fire scholarship video confirmation email (fire-and-forget)
+      if (application?.applicant_id) {
+        fetch('/api/scholarship/notify-submitted', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            applicantId: application.applicant_id,
+            videoUrl: saved.scholarship_video_url ?? videoUrl.trim(),
+          }),
+        }).catch(() => {
+          // Non-blocking — UI success is not dependent on email delivery
+        })
+      }
+
       // Refresh context in the background so realtime + sidebar stay in sync.
       refetch()
     } catch (err) {

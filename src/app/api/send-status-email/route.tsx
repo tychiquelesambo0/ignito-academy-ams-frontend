@@ -228,7 +228,7 @@ export async function POST(request: NextRequest) {
     }
 
     const name         = `${applicant.prenom} ${applicant.nom}`
-    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://ignitoacademy.com'}/dashboard`
+    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://admissions.ignitoacademy.com'}/dashboard`
 
     // 7. Build HTML email (no React rendering — pure template string)
     const { subject, html } = buildEmail(status, name, applicant_id, dashboardUrl, conditional_message)

@@ -371,6 +371,73 @@ export function documentsSubmittedEmail(opts: {
   }
 }
 
+// ─── Template 4b: Scholarship video submitted ─────────────────────────────────
+
+export function scholarshipVideoSubmittedEmail(opts: {
+  prenom:      string
+  nom:         string
+  applicantId: string
+  videoUrl:    string
+}): { subject: string; html: string } {
+  const body = `
+    <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:11px;color:#94a3b8;
+              text-transform:uppercase;letter-spacing:1px;">Bourse d'Excellence</p>
+    <h1 style="margin:0 0 24px;font-family:'Crimson Pro',Georgia,serif;font-size:26px;color:#021463;">
+      Votre vidéo de candidature a bien été reçue
+    </h1>
+
+    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;font-family:'Inter',Arial,sans-serif;">
+      Madame / Monsieur <strong>${opts.prenom} ${opts.nom}</strong>,
+    </p>
+
+    ${idBox(opts.applicantId)}
+
+    <p style="margin:0 0 20px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
+      Nous accusons bonne réception de votre vidéo de candidature pour la
+      <strong>Bourse d'Excellence Ignito Academy 2026</strong>.
+      Votre dossier est désormais soumis au jury d'évaluation.
+    </p>
+
+    <!-- Video confirmation box -->
+    <table width="100%" cellpadding="0" cellspacing="0"
+      style="background:#F8FAFC;border:1px solid #e2e8f0;border-left:4px solid #4EA6F5;
+             border-radius:6px;margin:0 0 24px;">
+      <tr><td style="padding:14px 20px;">
+        <p style="margin:0 0 4px;font-family:Arial,sans-serif;font-size:10px;color:#64748b;
+                  text-transform:uppercase;letter-spacing:1px;font-weight:bold;">
+          Vidéo soumise
+        </p>
+        <p style="margin:0;font-size:13px;color:#021463;line-height:1.6;word-break:break-all;">
+          <a href="${opts.videoUrl}" style="color:#021463;">${opts.videoUrl}</a>
+        </p>
+      </td></tr>
+    </table>
+
+    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
+      Le jury d'Ignito Academy examinera votre candidature et vous communiquera
+      sa décision par voie électronique dans les meilleurs délais.
+      Vous pouvez suivre l'état de votre dossier directement sur votre portail.
+    </p>
+
+    <p style="margin:0 0 24px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
+      Connectez-vous à votre espace candidat sur le portail
+      <a href="${APP_URL}/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
+      pour suivre l'avancement de votre candidature à la bourse.
+    </p>
+
+    ${signOff()}`
+
+  return {
+    subject: `Bourse d'Excellence — Votre vidéo a été reçue (${opts.applicantId})`,
+    html:    layout({
+      preheader:       `Votre candidature pour la Bourse d'Excellence a bien été enregistrée, ${opts.prenom}.`,
+      headerTitle:     "Bourse d'Excellence — Vidéo reçue",
+      headerSubtitle:  "Bourse d'Excellence — Admitta",
+      body,
+    }),
+  }
+}
+
 // ─── Template 5: Refusal ──────────────────────────────────────────────────────
 
 export function refusalEmail(opts: {
