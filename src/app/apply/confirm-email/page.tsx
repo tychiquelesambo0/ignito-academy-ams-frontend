@@ -68,7 +68,7 @@ function ConfirmEmailContent() {
               <ol className="space-y-2 text-sm text-slate-600">
                 <li className="flex gap-2">
                   <span className="w-5 h-5 rounded-full bg-[#021463] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
-                  <span>Ouvrez votre boîte de réception et cherchez un email de <strong>admin@ignitoacademy.com</strong></span>
+                  <span>Ouvrez votre boîte de réception et cherchez un email de <strong>admissions@ignitoacademy.com</strong></span>
                 </li>
                 <li className="flex gap-2">
                   <span className="w-5 h-5 rounded-full bg-[#021463] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
