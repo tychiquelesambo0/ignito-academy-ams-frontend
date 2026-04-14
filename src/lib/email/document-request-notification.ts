@@ -53,11 +53,11 @@ export function buildDocumentRequestEmail(opts: {
 
         <!-- Header -->
         <tr>
-          <td style="background:#ffffff;padding:28px 40px 24px;border-bottom:3px solid #021463;text-align:center;">
+          <td style="background:#021463;padding:28px 40px 24px;text-align:center;">
             <img src="${logoUrl()}" alt="Ignito Academy" width="180" height="auto"
                  style="display:block;margin:0 auto;max-width:180px;height:auto;" />
             <p style="margin:10px 0 0;font-family:'Inter',Arial,sans-serif;font-size:10px;
-                      color:#94a3b8;letter-spacing:1.5px;text-transform:uppercase;">
+                      color:rgba(255,255,255,0.55);letter-spacing:1.5px;text-transform:uppercase;">
               Bureau des Admissions — Admitta
             </p>
           </td>
