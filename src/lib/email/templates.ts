@@ -94,6 +94,25 @@ function idBox(applicantId: string): string {
   </table>`
 }
 
+// ─── Dashboard CTA button ──────────────────────────────────────────────────────
+
+function ctaButton(label: string): string {
+  return `
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 0;">
+    <tr>
+      <td align="center">
+        <a href="${APP_URL}/dashboard"
+           style="display:inline-block;background:#021463;color:#ffffff;
+                  font-family:'Inter',Arial,sans-serif;font-size:14px;font-weight:600;
+                  text-decoration:none;padding:14px 32px;border-radius:6px;
+                  letter-spacing:0.2px;">
+          ${label}
+        </a>
+      </td>
+    </tr>
+  </table>`
+}
+
 // ─── Sign-off block ────────────────────────────────────────────────────────────
 
 function signOff(): string {
@@ -156,11 +175,12 @@ export function paymentConfirmationEmail(opts: {
       Vous serez informé(e) de la décision finale par voie électronique dans les meilleurs délais.
     </p>
 
-    <p style="margin:0 0 24px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
-      Vous pouvez suivre l'avancement de votre candidature en temps réel sur le portail
-      <a href="${APP_URL}" style="color:#021463;font-weight:bold;">Admitta</a>.
-      Conservez cet email comme preuve de paiement.
+    <p style="margin:0 0 8px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
+      Conservez cet email comme preuve de paiement. Vous pouvez suivre l'avancement
+      de votre candidature en temps réel sur votre espace candidat.
     </p>
+
+    ${ctaButton('Accéder à mon espace candidat')}
 
     ${signOff()}`
 
@@ -219,12 +239,12 @@ export function finalAcceptanceEmail(opts: {
       selon le cadre d'excellence britannique (RQF).
     </p>
 
-    <p style="margin:0 0 24px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
-      Votre lettre d'admission officielle est disponible en téléchargement sur votre portail.
-      Veuillez vous connecter au portail
-      <a href="${APP_URL}/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
-      pour télécharger votre lettre et procéder aux formalités d'inscription finale.
+    <p style="margin:0 0 8px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
+      Votre lettre d'admission officielle est disponible en téléchargement sur votre espace candidat.
+      Connectez-vous pour télécharger votre lettre et procéder aux formalités d'inscription finale.
     </p>
+
+    ${ctaButton("Télécharger ma lettre d'admission")}
 
     ${signOff()}`
 
@@ -286,17 +306,14 @@ export function conditionalAcceptanceEmail(opts: {
       </td></tr>
     </table>
 
-    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
-      Vous disposez d'un délai limité pour soumettre ces documents directement sur le portail
-      <a href="${APP_URL}" style="color:#021463;font-weight:bold;">Admitta</a>.
+    <p style="margin:0 0 8px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
+      Vous disposez d'un délai limité pour soumettre ces documents depuis votre espace candidat.
       Dès leur validation par le Comité, votre statut passera automatiquement en
-      <strong>Admission Définitive</strong>.
+      <strong>Admission Définitive</strong>. Votre lettre de décision officielle est également
+      disponible en téléchargement.
     </p>
 
-    <p style="margin:0 0 24px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
-      Votre lettre de décision officielle est disponible en téléchargement sur votre portail
-      <a href="${APP_URL}/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>.
-    </p>
+    ${ctaButton('Soumettre mes documents')}
 
     ${signOff()}`
 
@@ -352,11 +369,7 @@ export function documentsSubmittedEmail(opts: {
       </td></tr>
     </table>
 
-    <p style="margin:0 0 24px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
-      Connectez-vous à votre espace candidat sur le portail
-      <a href="${APP_URL}/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
-      pour procéder au paiement et finaliser votre candidature.
-    </p>
+    ${ctaButton('Procéder au paiement')}
 
     ${signOff()}`
 
@@ -419,11 +432,7 @@ export function scholarshipVideoSubmittedEmail(opts: {
       Vous pouvez suivre l'état de votre dossier directement sur votre portail.
     </p>
 
-    <p style="margin:0 0 24px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
-      Connectez-vous à votre espace candidat sur le portail
-      <a href="${APP_URL}/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
-      pour suivre l'avancement de votre candidature à la bourse.
-    </p>
+    ${ctaButton('Suivre ma candidature')}
 
     ${signOff()}`
 
@@ -470,11 +479,13 @@ export function refusalEmail(opts: {
       notre programme.
     </p>
 
-    <p style="margin:0 0 24px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
+    <p style="margin:0 0 8px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Cette décision ne remet nullement en cause vos qualités personnelles ni votre potentiel
       académique. Nous vous souhaitons une excellente continuation et beaucoup de succès dans
       vos futurs projets universitaires.
     </p>
+
+    ${ctaButton('Consulter mon dossier')}
 
     ${signOff()}`
 
