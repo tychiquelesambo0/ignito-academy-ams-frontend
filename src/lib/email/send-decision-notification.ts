@@ -9,8 +9,8 @@
  * Never throws — returns { sent, wasMock, error }.
  */
 
-import { Resend } from 'resend'
 import { createAdminClient } from '@/lib/supabase/server'
+import { sendEmailWithRetry } from './send-with-retry'
 import {
   finalAcceptanceEmail,
   conditionalAcceptanceEmail,
@@ -94,31 +94,30 @@ export async function sendDecisionNotification(
       }))
     }
 
-    // 4. Check for mock mode
-    const resendKey = process.env.RESEND_API_KEY
-    const isMock    = !resendKey || resendKey.startsWith('mock-') || resendKey === 'your-resend-api-key'
+    // 4. Send via shared retry utility (handles mock-mode detection, retry, and logging)
+    const emailTypeMap: Record<string, string> = {
+      'Admission définitive':   'final_acceptance',
+      'Admission sous réserve': 'conditional_acceptance',
+      'Dossier refusé':         'refusal',
+    }
 
-    if (isMock) {
+    const result = await sendEmailWithRetry({
+      to:         applicant.email,
+      subject,
+      html,
+      applicantId,
+      emailType:  emailTypeMap[status] ?? 'final_acceptance',
+    })
+
+    if (result.wasMock) {
       console.warn(
         `[sendDecisionNotification] MOCK — would send "${subject}" to ${applicant.email}`,
       )
       return { sent: true, wasMock: true }
     }
 
-    // 5. Send via Resend
-    const resend    = new Resend(resendKey)
-    const fromEmail = process.env.FROM_EMAIL?.trim() || 'Ignito Academy <noreply@ignitoacademy.com>'
-
-    const { error: sendErr } = await resend.emails.send({
-      from:    fromEmail,
-      to:      [applicant.email],
-      subject,
-      html,
-    })
-
-    if (sendErr) {
-      console.error('[sendDecisionNotification] Resend error:', sendErr)
-      return { sent: false, wasMock: false, error: sendErr.message }
+    if (!result.success) {
+      return { sent: false, wasMock: false, error: result.error }
     }
 
     console.log(`[sendDecisionNotification] ✓ sent "${status}" email to ${applicant.email}`)

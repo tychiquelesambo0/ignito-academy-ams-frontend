@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
 
     // 9. Send via Resend
     const resend    = new Resend(resendKey)
-    const fromEmail = process.env.FROM_EMAIL?.trim() || 'Ignito Academy <admin@ignitoacademy.com>'
+    const fromEmail = process.env.FROM_EMAIL?.trim() || 'Ignito Academy <admissions@ignitoacademy.com>'
 
     console.log(`[send-status-email] calling resend.emails.send from="${fromEmail}" to="${applicant.email}"`)
 

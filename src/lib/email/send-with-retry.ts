@@ -15,6 +15,13 @@ export type EmailType =
   | 'conditional_acceptance'
   | 'final_acceptance'
   | 'refusal'
+  | 'documents_submitted'
+  | 'document_request'
+  | 'scholarship_video_submitted'
+  | 'decision_admission_sous_réserve'
+  | 'decision_admission_définitive'
+  | 'decision_dossier_refusé'
+  | string  // allow future types without breaking builds
 
 export interface SendEmailOptions {
   /** Recipient email address */
