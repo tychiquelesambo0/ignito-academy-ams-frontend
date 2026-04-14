@@ -200,8 +200,8 @@ export function finalAcceptanceEmail(opts: {
 
     <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
       C'est avec un immense plaisir que le Comité des Admissions vous annonce votre admission
-      définitive à l'Année Préparatoire Internationale (Qualification de Niveau 3 — L3IFDHES)
-      au sein d'Ignito Academy pour la rentrée de <strong>Septembre 2026</strong>.
+      définitive à l'<strong>Année Préparatoire</strong> au sein d'Ignito Academy pour la
+      rentrée de <strong>Septembre 2026</strong>.
     </p>
 
     <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
@@ -254,8 +254,8 @@ export function conditionalAcceptanceEmail(opts: {
 
     <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
       Suite à l'évaluation rigoureuse de votre candidature, le Comité des Admissions a le plaisir
-      de vous proposer une <strong>offre d'admission sous réserve</strong> pour l'Année Préparatoire
-      Internationale (L3IFDHES) pour la rentrée de Septembre 2026.
+      de vous proposer une <strong>offre d'admission sous réserve</strong> pour l'<strong>Année
+      Préparatoire</strong> au sein d'Ignito Academy pour la rentrée de Septembre 2026.
     </p>
 
     <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
