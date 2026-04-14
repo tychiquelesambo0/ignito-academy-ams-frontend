@@ -3,6 +3,9 @@
  * All templates return a complete HTML string ready to pass to Resend.
  */
 
+// Production base URL — resolves to https://admissions.ignitoacademy.com in Vercel
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://admissions.ignitoacademy.com').replace(/\/$/, '')
+
 // ─── Shared layout wrapper ─────────────────────────────────────────────────────
 
 function layout(opts: {
@@ -147,7 +150,7 @@ export function paymentConfirmationEmail(opts: {
 
     <p style="margin:0 0 24px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
       Vous pouvez suivre l'avancement de votre candidature en temps réel sur le portail
-      <a href="https://admitta.ignitoacademy.cd" style="color:#021463;font-weight:bold;">Admitta</a>.
+      <a href="${APP_URL}" style="color:#021463;font-weight:bold;">Admitta</a>.
       Conservez cet email comme preuve de paiement.
     </p>
 
@@ -211,7 +214,7 @@ export function finalAcceptanceEmail(opts: {
     <p style="margin:0 0 24px;font-size:14px;color:#334155;line-height:1.8;">
       Votre lettre d'admission officielle est disponible en téléchargement sur votre portail.
       Veuillez vous connecter au portail
-      <a href="https://admitta.ignitoacademy.cd/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
+      <a href="${APP_URL}/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
       pour télécharger votre lettre et procéder aux formalités d'inscription finale.
     </p>
 
@@ -277,14 +280,14 @@ export function conditionalAcceptanceEmail(opts: {
 
     <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
       Vous disposez d'un délai limité pour soumettre ces documents directement sur le portail
-      <a href="https://admitta.ignitoacademy.cd" style="color:#021463;font-weight:bold;">Admitta</a>.
+      <a href="${APP_URL}" style="color:#021463;font-weight:bold;">Admitta</a>.
       Dès leur validation par le Comité, votre statut passera automatiquement en
       <strong>Admission Définitive</strong>.
     </p>
 
     <p style="margin:0 0 24px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
       Votre lettre de décision officielle est disponible en téléchargement sur votre portail
-      <a href="https://admitta.ignitoacademy.cd/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>.
+      <a href="${APP_URL}/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>.
     </p>
 
     ${signOff()}`
@@ -343,7 +346,7 @@ export function documentsSubmittedEmail(opts: {
 
     <p style="margin:0 0 24px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
       Connectez-vous à votre espace candidat sur le portail
-      <a href="https://admitta.ignitoacademy.cd/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
+      <a href="${APP_URL}/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
       pour procéder au paiement et finaliser votre candidature.
     </p>
 
