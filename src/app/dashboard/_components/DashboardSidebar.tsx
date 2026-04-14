@@ -83,28 +83,28 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
       >
 
         {/* ── Logo row ─────────────────────────────────────────────────────── */}
-        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-5">
+        <div className="relative flex shrink-0 flex-col items-center justify-center gap-2 border-b border-white/10 px-5 py-5">
           <Image
             src="/ignito-logo-white.svg"
             alt="Ignito Academy"
-            width={30}
-            height={30}
+            width={130}
+            height={42}
             className="shrink-0"
             priority
           />
-          <span className="flex-1 font-serif text-[17px] font-semibold leading-tight text-white">
-            Ignito Academy
+          <span className="font-serif text-[13px] font-semibold tracking-widest text-white/65">
+            Admitta
           </span>
 
-          {/* Close button — mobile only */}
+          {/* Close button — mobile only, pinned top-right */}
           <button
             onClick={onClose}
             aria-label="Fermer le menu"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md
+            className="absolute right-3 top-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-md
                        text-white/50 hover:bg-white/10 hover:text-white
                        transition-colors lg:hidden"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
@@ -258,10 +258,9 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
 
         {/* ── Footer ───────────────────────────────────────────────────────── */}
         <div className="shrink-0 border-t border-white/10 px-5 py-4">
-          <p className="text-[11px] leading-snug text-white/35">
-            UK Level 3 Foundation Diploma
+          <p className="text-[10px] leading-snug text-white/30">
+            © 2026 Ignito Academy. Tous droits réservés.
           </p>
-          <p className="mt-0.5 text-[11px] text-white/25">Promotion 2026</p>
         </div>
       </aside>
     </>

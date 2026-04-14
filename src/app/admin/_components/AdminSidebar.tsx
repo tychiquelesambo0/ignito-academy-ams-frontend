@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Award, X } from 'lucide-react'
 
@@ -35,19 +36,23 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         ].join(' ')}
       >
         {/* ── Logo ── */}
-        <div className="flex h-16 shrink-0 items-center justify-between
-                        border-b border-white/10 px-4">
-          <div>
-            <span className="font-serif text-xl font-bold tracking-tight text-white">
-              Admitta
-            </span>
-            <p className="mt-0.5 text-[10px] font-medium tracking-wide text-white/40">
-              Bureau des Admissions
-            </p>
-          </div>
+        <div className="relative flex shrink-0 flex-col items-center justify-center gap-2 border-b border-white/10 px-4 py-5">
+          <Image
+            src="/ignito-logo-white.svg"
+            alt="Ignito Academy"
+            width={130}
+            height={42}
+            className="shrink-0"
+            priority
+          />
+          <span className="font-serif text-[13px] font-semibold tracking-widest text-white/65">
+            Admitta
+          </span>
+
+          {/* Close button — mobile only, pinned top-right */}
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-md
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-md
                        text-white/50 transition-colors hover:bg-white/10 lg:hidden"
             aria-label="Fermer le menu"
           >
@@ -102,10 +107,9 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
         {/* ── Footer ── */}
         <div className="shrink-0 border-t border-white/10 px-4 py-4">
-          <p className="text-[10px] font-medium text-white/25">
-            UK Level 3 Foundation Diploma
+          <p className="text-[10px] leading-snug text-white/30">
+            © 2026 Ignito Academy. Tous droits réservés.
           </p>
-          <p className="text-[10px] text-white/25">Promotion 2026</p>
         </div>
       </aside>
     </>
