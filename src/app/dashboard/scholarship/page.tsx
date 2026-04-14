@@ -165,7 +165,7 @@ function SubmittedView({ videoUrl }: { videoUrl: string }) {
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
 
-      {/* Lock banner */}
+      {/* Submission confirmation banner */}
       <div className="flex items-start gap-3.5 rounded-lg border border-[#10B981]/25
                       bg-[#10B981]/8 px-5 py-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center
@@ -173,13 +173,13 @@ function SubmittedView({ videoUrl }: { videoUrl: string }) {
           <ShieldCheck className="h-4.5 w-4.5 text-[#10B981]" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-slate-800">
-            Candidature soumise — en cours d'évaluation
+          <p className="font-serif text-base font-semibold text-slate-800">
+            Plaidoyer Transmis avec Succès
           </p>
-          <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
-            Votre vidéo de présentation a été reçue. Notre jury l'évaluera
-            prochainement. Vous serez notifié par email dès qu'une décision
-            sera rendue. Aucune modification n'est possible à ce stade.
+          <p className="mt-0.5 text-sm leading-relaxed text-slate-500">
+            Votre vidéo a été sécurisée et transmise au comité académique. Les résultats
+            d&apos;attribution de la Bourse d&apos;Excellence vous seront communiqués à l&apos;issue
+            des délibérations.
           </p>
         </div>
       </div>
@@ -346,14 +346,8 @@ export default function ScholarshipPage() {
     <div className="space-y-8 animate-in fade-in duration-300">
       <PageHeader />
 
-      {/* Eligibility badge */}
-      <div className="flex items-center gap-2 rounded-md border border-[#10B981]/25
-                      bg-[#10B981]/8 px-4 py-2.5 w-fit">
-        <CheckCircle2 className="h-4 w-4 text-[#10B981]" />
-        <span className="text-sm font-medium text-[#10B981]">
-          Éligible à la Bourse d&apos;Excellence 2026
-        </span>
-      </div>
+      {/* Eligibility banner */}
+      <EligibilityBanner />
 
       <SubmittedView videoUrl={savedVideoUrl} />
 
@@ -435,14 +429,8 @@ export default function ScholarshipPage() {
     <div className="space-y-8">
       <PageHeader />
 
-      {/* Eligibility badge */}
-      <div className="flex items-center gap-2 rounded-md border border-[#10B981]/25
-                      bg-[#10B981]/8 px-4 py-2.5 w-fit">
-        <CheckCircle2 className="h-4 w-4 text-[#10B981]" />
-        <span className="text-sm font-medium text-[#10B981]">
-          Éligible à la Bourse d&apos;Excellence 2026
-        </span>
-      </div>
+      {/* Eligibility banner */}
+      <EligibilityBanner />
 
       {/* Instructions card */}
       <div className="rounded-lg bg-white p-6 shadow-sm space-y-3">
@@ -452,25 +440,25 @@ export default function ScholarshipPage() {
             <Award className="h-5 w-5 text-[#031463]" />
           </div>
           <div>
-            <h2 className="font-serif text-base font-semibold text-slate-800">
-              Soumettre votre candidature
+            <h2 className="font-serif text-lg font-semibold text-slate-800">
+              Votre Plaidoyer Vidéo
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-slate-500">
-              Enregistrez une vidéo de présentation (2 à 5 minutes) dans laquelle
-              vous expliquez votre motivation, vos ambitions académiques et pourquoi
-              vous méritez la Bourse d&apos;Excellence d&apos;Ignito Academy.
-              Publiez-la sur YouTube ou Vimeo et collez le lien ci-dessous.
+              Au-delà des relevés de notes, notre comité d&apos;admission recherche des esprits
+              visionnaires. Dans une vidéo de deux minutes, présentez vos ambitions, votre vision
+              du leadership, et démontrez en quoi vous incarnerez l&apos;excellence de notre cohorte
+              pour le UK Level 3 Foundation Diploma.
             </p>
           </div>
         </div>
-        <ul className="mt-1 ml-12 space-y-1 text-xs text-slate-500">
+        <ul className="mt-1 ml-12 space-y-1.5 text-xs text-slate-500">
           {[
-            'Durée : 2 à 5 minutes',
-            'Langue : français ou anglais',
-            'Plateformes acceptées : YouTube · Vimeo',
+            'Durée stricte : 2 minutes maximum.',
+            'Format : Présentez-vous face caméra, dans un environnement calme et professionnel.',
+            'Hébergement : Publiez votre vidéo sur YouTube (en mode "Non répertorié") ou sur Vimeo.',
           ].map((item) => (
-            <li key={item} className="flex items-center gap-1.5">
-              <span className="h-1 w-1 rounded-full bg-[#4EA6F5]" />
+            <li key={item} className="flex items-start gap-1.5">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#4EA6F5]" />
               {item}
             </li>
           ))}
@@ -481,7 +469,7 @@ export default function ScholarshipPage() {
       <div className="rounded-lg bg-white p-6 shadow-sm space-y-5">
         <div className="space-y-1.5">
           <label htmlFor="video-url" className="block text-sm font-medium text-slate-700">
-            Lien de votre vidéo <span className="text-[#EF4444]">*</span>
+            Lien URL de votre plaidoyer (YouTube ou Vimeo) <span className="text-[#EF4444]">*</span>
           </label>
           <div className="relative">
             <Play className="pointer-events-none absolute left-3 top-1/2 h-4 w-4
@@ -491,7 +479,7 @@ export default function ScholarshipPage() {
               type="url"
               value={videoUrl}
               onChange={(e) => { setVideoUrl(e.target.value); setSaveError(null) }}
-              placeholder="https://www.youtube.com/watch?v=… ou https://vimeo.com/…"
+              placeholder="https://www.youtube.com/watch?v=..."
               className="h-12 w-full rounded-md border border-slate-200 bg-white
                          pl-10 pr-4 text-sm text-slate-800 outline-none
                          focus:border-[#4EA6F5] focus:ring-2 focus:ring-[#4EA6F5]/20
@@ -562,12 +550,34 @@ export default function ScholarshipPage() {
           {saving ? (
             <span className="flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Envoi en cours…
+              Transmission en cours...
             </span>
           ) : (
-            'Soumettre ma candidature'
+            'Soumettre ma candidature à la Bourse'
           )}
         </button>
+      </div>
+    </div>
+  )
+}
+
+// ─── Eligibility confirmed banner ────────────────────────────────────────────
+
+function EligibilityBanner() {
+  return (
+    <div className="flex items-start gap-4 rounded-lg border border-[#10B981]/25 bg-[#10B981]/8 px-5 py-4">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[#10B981]/15">
+        <CheckCircle2 className="h-5 w-5 text-[#10B981]" />
+      </div>
+      <div>
+        <p className="font-serif text-base font-semibold text-slate-800">
+          Éligibilité Confirmée
+        </p>
+        <p className="mt-1 text-sm leading-relaxed text-slate-600">
+          Félicitations. L&apos;examen de votre parcours scolaire témoigne d&apos;une excellence académique
+          remarquable. Vous êtes officiellement invité(e) à postuler pour notre Bourse d&apos;Excellence,
+          une distinction strictement limitée à <strong>20 candidats</strong> par session.
+        </p>
       </div>
     </div>
   )
@@ -586,10 +596,10 @@ function PageHeader() {
         </div>
         <div>
           <h1 className="font-serif text-3xl font-semibold text-slate-800">
-            Bourse d'Excellence
+            La Bourse d&apos;Excellence Académique
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Programme de bourses — Promotion 2026
+            Une distinction prestigieuse réservée aux futurs leaders.
           </p>
         </div>
       </div>
