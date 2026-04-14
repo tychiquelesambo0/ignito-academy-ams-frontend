@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Menu, LogOut, Shield } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import NotificationBell from './NotificationBell'
 
 interface AdminTopBarProps {
   onMenuOpen: () => void
@@ -97,6 +98,9 @@ export default function AdminTopBar({ onMenuOpen }: AdminTopBarProps) {
           <Shield className="h-3 w-3" />
           Admin
         </span>
+
+        {/* Notification bell */}
+        <NotificationBell />
 
         {/* Sign out */}
         <button
