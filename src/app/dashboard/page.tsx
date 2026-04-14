@@ -18,6 +18,7 @@
  */
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { APPLICATION_FEE_USD } from '@/lib/payment/currency'
@@ -36,6 +37,13 @@ import {
 } from 'lucide-react'
 import { useApplication } from '@/lib/context/ApplicationContext'
 import type { Applicant, Application } from '@/lib/context/ApplicationContext'
+import type { DecisionStatus } from '@/components/pdf/DecisionLetterPDF'
+
+// Lazy-load PDF button — @react-pdf/renderer is client-only and large
+const PDFDownloadButton = dynamic(
+  () => import('@/components/pdf/PDFDownloadButton').then((m) => m.PDFDownloadButton),
+  { ssr: false, loading: () => null },
+)
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -779,6 +787,31 @@ function SubmittedState({
 
         </div>
       </div>
+
+      {/* ── Decision letter download — shown for all decision statuses ── */}
+      {(isFinal || isConditional || isRejected) && (
+        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[#021463]/8">
+              <FileText className="h-4 w-4 text-[#021463]" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-800">
+                Lettre de décision officielle
+              </p>
+              <p className="mt-0.5 text-xs text-slate-500">
+                Téléchargez votre lettre officielle au format PDF.
+              </p>
+            </div>
+          </div>
+          <PDFDownloadButton
+            applicantName={applicant ? `${applicant.prenom} ${applicant.nom}` : 'Candidat(e)'}
+            applicantId={application.applicant_id}
+            status={status as DecisionStatus}
+            conditionalMessage={application.conditional_message}
+          />
+        </div>
+      )}
 
       {/* ── Documents link : masqué si demande active (bannière globale + page Documents) ── */}
       {!isRejected && !isFinal && !application.conditional_message?.trim() && (

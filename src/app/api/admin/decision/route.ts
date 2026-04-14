@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { sendDecisionNotification } from '@/lib/email/send-decision-notification'
 
 const DecisionSchema = z.object({
   applicantId:        z.string().min(1),
@@ -108,6 +109,21 @@ export async function POST(req: NextRequest) {
         notes:           conditionalMessage?.trim() ?? null,
       })
       .then() // fire-and-forget; don't fail the request if this errors
+
+    // ── 5. Send decision notification email (fire-and-forget) ────────────────
+    sendDecisionNotification({
+      applicantId,
+      status,
+      conditionalMessage: conditionalMessage?.trim() ?? null,
+    }).then((result) => {
+      if (result.wasMock) {
+        console.warn('[admin/decision] email mock mode — set RESEND_API_KEY in Vercel env')
+      } else if (!result.sent) {
+        console.error('[admin/decision] email send failed:', result.error)
+      } else {
+        console.log(`[admin/decision] ✓ decision email sent for ${applicantId}`)
+      }
+    }).catch((err) => console.error('[admin/decision] email unexpected error:', err))
 
     return NextResponse.json({ success: true, updated })
 

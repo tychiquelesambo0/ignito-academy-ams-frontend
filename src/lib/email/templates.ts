@@ -209,10 +209,10 @@ export function finalAcceptanceEmail(opts: {
     </p>
 
     <p style="margin:0 0 24px;font-size:14px;color:#334155;line-height:1.8;">
-      Votre lettre d'admission officielle est jointe en pièce jointe à cet email. Veuillez vous
-      connecter au portail
-      <a href="https://admitta.ignitoacademy.cd" style="color:#021463;font-weight:bold;">Admitta</a>
-      pour accepter cette offre et procéder aux formalités d'inscription finale.
+      Votre lettre d'admission officielle est disponible en téléchargement sur votre portail.
+      Veuillez vous connecter au portail
+      <a href="https://admitta.ignitoacademy.cd/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
+      pour télécharger votre lettre et procéder aux formalités d'inscription finale.
     </p>
 
     ${signOff()}`
@@ -283,7 +283,8 @@ export function conditionalAcceptanceEmail(opts: {
     </p>
 
     <p style="margin:0 0 24px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
-      Votre lettre de décision officielle est jointe en pièce jointe à cet email.
+      Votre lettre de décision officielle est disponible en téléchargement sur votre portail
+      <a href="https://admitta.ignitoacademy.cd/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>.
     </p>
 
     ${signOff()}`
@@ -299,7 +300,67 @@ export function conditionalAcceptanceEmail(opts: {
   }
 }
 
-// ─── Template 4: Refusal ──────────────────────────────────────────────────────
+// ─── Template 4a: Documents submitted (initial) ───────────────────────────────
+
+export function documentsSubmittedEmail(opts: {
+  prenom:      string
+  nom:         string
+  applicantId: string
+}): { subject: string; html: string } {
+  const body = `
+    <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:11px;color:#94a3b8;
+              text-transform:uppercase;letter-spacing:1px;">Confirmation de dépôt</p>
+    <h1 style="margin:0 0 24px;font-family:Georgia,serif;font-size:24px;color:#021463;">
+      Vos documents ont bien été reçus
+    </h1>
+
+    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;">
+      Madame / Monsieur <strong>${opts.prenom} ${opts.nom}</strong>,
+    </p>
+
+    ${idBox(opts.applicantId)}
+
+    <p style="margin:0 0 20px;font-size:14px;color:#334155;line-height:1.8;">
+      Nous accusons bonne réception de vos pièces justificatives. Votre dossier est désormais
+      complet et prêt pour l'étape de paiement des frais d'étude de dossier.
+    </p>
+
+    <!-- Next step box -->
+    <table width="100%" cellpadding="0" cellspacing="0"
+      style="background:#F8FAFC;border:1px solid #e2e8f0;border-left:4px solid #4EA6F5;
+             border-radius:6px;margin:0 0 24px;">
+      <tr><td style="padding:14px 20px;">
+        <p style="margin:0 0 4px;font-family:Arial,sans-serif;font-size:10px;color:#64748b;
+                  text-transform:uppercase;letter-spacing:1px;font-weight:bold;">
+          Prochaine étape
+        </p>
+        <p style="margin:0;font-size:14px;color:#021463;font-weight:bold;line-height:1.6;">
+          Réglez les frais d'étude de dossier sur le portail Admitta pour soumettre
+          officiellement votre candidature à la Commission des Admissions.
+        </p>
+      </td></tr>
+    </table>
+
+    <p style="margin:0 0 24px;font-size:13px;color:#64748b;line-height:1.7;font-family:Arial,sans-serif;">
+      Connectez-vous à votre espace candidat sur le portail
+      <a href="https://admitta.ignitoacademy.cd/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
+      pour procéder au paiement et finaliser votre candidature.
+    </p>
+
+    ${signOff()}`
+
+  return {
+    subject: `Documents reçus — Prochaine étape : paiement (${opts.applicantId})`,
+    html:    layout({
+      preheader:      `Vos documents pour la candidature ${opts.applicantId} ont bien été reçus.`,
+      headerTitle:    'Documents reçus',
+      headerSubtitle: 'Bureau des Admissions — Admitta',
+      body,
+    }),
+  }
+}
+
+// ─── Template 5: Refusal ──────────────────────────────────────────────────────
 
 export function refusalEmail(opts: {
   prenom:      string

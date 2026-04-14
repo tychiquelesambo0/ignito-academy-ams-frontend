@@ -519,6 +519,11 @@ function DocumentsForm() {
       if (error) throw new Error(error.message)
       if (!saved) throw new Error('La mise à jour n\'a pas abouti. Réessayez.')
 
+      // Send confirmation email (fire-and-forget — don't block the UI)
+      fetch('/api/documents/notify-submitted', { method: 'POST' }).catch((e) =>
+        console.warn('[documents] notify-submitted error (non-fatal):', e),
+      )
+
       await refetch()
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Erreur lors de la soumission.')
