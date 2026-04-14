@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Confirmation email — fire and forget
+      // Confirmation email — awaited so Vercel doesn't kill it before it fires
       if (profile) {
         const { subject, html } = paymentConfirmationEmail({
           prenom: profile.prenom,
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
           amount: `${APPLICATION_FEE_USD} USD`,
           date: new Date().toISOString(),
         })
-        sendEmailWithRetry({
+        await sendEmailWithRetry({
           to: profile.email,
           subject,
           html,

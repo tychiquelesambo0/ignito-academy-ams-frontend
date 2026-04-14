@@ -1,23 +1,23 @@
 /**
- * Shared helper: send the correct decision/status notification email
- * to an applicant after an admin makes a decision or a status change occurs.
+ * sendDecisionNotification
  *
- * Used by:
- *  - /api/admin/decision  (after status update)
- *  - future automated triggers
+ * Sends the correct branded email to an applicant after an admin records
+ * an admission decision. Called from /api/admin/decision and MUST be awaited
+ * before the HTTP response is returned (Vercel kills fire-and-forget promises).
  *
- * Never throws — returns { sent, wasMock, error }.
+ * Uses Resend directly — no email_logs table dependency so there are fewer
+ * failure points.
+ *
+ * Never throws — always returns { sent, wasMock, error? }.
  */
 
+import { Resend } from 'resend'
 import { createAdminClient } from '@/lib/supabase/server'
-import { sendEmailWithRetry } from './send-with-retry'
 import {
   finalAcceptanceEmail,
   conditionalAcceptanceEmail,
   refusalEmail,
 } from './templates'
-
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 type DecisionStatus =
   | 'Admission définitive'
@@ -25,7 +25,6 @@ type DecisionStatus =
   | 'Dossier refusé'
 
 interface SendDecisionNotificationOpts {
-  /** Formatted applicant ID, e.g. "IGN-2026-00008" */
   applicantId:         string
   status:              DecisionStatus
   conditionalMessage?: string | null
@@ -37,8 +36,6 @@ interface SendResult {
   error?:  string
 }
 
-// ─── Main function ────────────────────────────────────────────────────────────
-
 export async function sendDecisionNotification(
   opts: SendDecisionNotificationOpts,
 ): Promise<SendResult> {
@@ -47,7 +44,7 @@ export async function sendDecisionNotification(
   try {
     const admin = createAdminClient()
 
-    // 1. Look up application to get user_id
+    // ── 1. Look up application → user_id ────────────────────────────────────
     const { data: appRow, error: appErr } = await admin
       .from('applications')
       .select('user_id')
@@ -55,10 +52,12 @@ export async function sendDecisionNotification(
       .maybeSingle()
 
     if (appErr || !appRow) {
-      return { sent: false, wasMock: false, error: `Application not found: ${applicantId}` }
+      const msg = `Application not found: ${applicantId} — ${appErr?.message ?? 'no row'}`
+      console.error('[sendDecisionNotification]', msg)
+      return { sent: false, wasMock: false, error: msg }
     }
 
-    // 2. Look up applicant details
+    // ── 2. Look up applicant details ─────────────────────────────────────────
     const { data: applicant, error: aptErr } = await admin
       .from('applicants')
       .select('prenom, nom, email')
@@ -66,17 +65,19 @@ export async function sendDecisionNotification(
       .maybeSingle()
 
     if (aptErr || !applicant) {
-      return { sent: false, wasMock: false, error: `Applicant not found for user_id: ${appRow.user_id}` }
+      const msg = `Applicant not found for user_id ${appRow.user_id} — ${aptErr?.message ?? 'no row'}`
+      console.error('[sendDecisionNotification]', msg)
+      return { sent: false, wasMock: false, error: msg }
     }
 
-    // 3. Build the email for the correct decision type
+    // ── 3. Build email for the decision type ─────────────────────────────────
     let subject: string
     let html:    string
 
     if (status === 'Admission définitive') {
       ;({ subject, html } = finalAcceptanceEmail({
-        prenom:      applicant.prenom,
-        nom:         applicant.nom,
+        prenom: applicant.prenom,
+        nom:    applicant.nom,
         applicantId,
       }))
     } else if (status === 'Admission sous réserve') {
@@ -88,39 +89,52 @@ export async function sendDecisionNotification(
       }))
     } else {
       ;({ subject, html } = refusalEmail({
-        prenom:      applicant.prenom,
-        nom:         applicant.nom,
+        prenom: applicant.prenom,
+        nom:    applicant.nom,
         applicantId,
       }))
     }
 
-    // 4. Send via shared retry utility (handles mock-mode detection, retry, and logging)
-    const emailTypeMap: Record<string, string> = {
-      'Admission définitive':   'final_acceptance',
-      'Admission sous réserve': 'conditional_acceptance',
-      'Dossier refusé':         'refusal',
-    }
+    // ── 4. Check Resend API key ───────────────────────────────────────────────
+    const resendKey = process.env.RESEND_API_KEY?.trim()
+    const isMock    = !resendKey
+                      || resendKey === 'your-resend-api-key'
+                      || resendKey.startsWith('mock-')
 
-    const result = await sendEmailWithRetry({
-      to:         applicant.email,
-      subject,
-      html,
-      applicantId,
-      emailType:  emailTypeMap[status] ?? 'final_acceptance',
-    })
-
-    if (result.wasMock) {
+    if (isMock) {
       console.warn(
-        `[sendDecisionNotification] MOCK — would send "${subject}" to ${applicant.email}`,
+        `[sendDecisionNotification] MOCK — RESEND_API_KEY not configured.` +
+        ` Would send "${subject}" to ${applicant.email}`,
       )
       return { sent: true, wasMock: true }
     }
 
-    if (!result.success) {
-      return { sent: false, wasMock: false, error: result.error }
+    // ── 5. Send via Resend ────────────────────────────────────────────────────
+    const fromEmail = process.env.FROM_EMAIL?.trim()
+                   || 'Ignito Academy <admissions@ignitoacademy.com>'
+
+    console.log(
+      `[sendDecisionNotification] sending "${status}" to ${applicant.email}` +
+      ` from ${fromEmail}`,
+    )
+
+    const resend               = new Resend(resendKey)
+    const { data, error: sendErr } = await resend.emails.send({
+      from:    fromEmail,
+      to:      [applicant.email],
+      subject,
+      html,
+    })
+
+    if (sendErr) {
+      console.error('[sendDecisionNotification] Resend error:', sendErr)
+      return { sent: false, wasMock: false, error: sendErr.message }
     }
 
-    console.log(`[sendDecisionNotification] ✓ sent "${status}" email to ${applicant.email}`)
+    console.log(
+      `[sendDecisionNotification] ✓ sent to ${applicant.email},` +
+      ` messageId=${data?.id}`,
+    )
     return { sent: true, wasMock: false }
 
   } catch (err) {

@@ -20,10 +20,7 @@ export async function POST(req: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Non authentifié.' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
     }
 
     const { data: officer } = await supabase
@@ -36,34 +33,32 @@ export async function POST(req: NextRequest) {
     if (!officer) {
       return NextResponse.json(
         { error: 'Accès refusé. Réservé au personnel autorisé.' },
-        { status: 403 }
+        { status: 403 },
       )
     }
 
     // ── 2. Validate payload ──────────────────────────────────────────────────
-    const body = await req.json()
+    const body   = await req.json()
     const parsed = DecisionSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Données invalides.', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     const { applicantId, status, conditionalMessage } = parsed.data
 
-    // Conditional admission requires a message
     if (status === 'Admission sous réserve' && !conditionalMessage?.trim()) {
       return NextResponse.json(
         { error: "Un message explicatif est obligatoire pour l'admission sous réserve." },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
-    // ── 3. Apply the decision using the admin (service-role) client ──────────
+    // ── 3. Apply the decision ────────────────────────────────────────────────
     const admin = createAdminClient()
 
-    // Fetch previous status first for the audit trail
     const { data: current } = await admin
       .from('applications')
       .select('application_status')
@@ -94,44 +89,47 @@ export async function POST(req: NextRequest) {
       console.error('[admin/decision] update error:', updateError)
       return NextResponse.json(
         { error: 'Impossible de mettre à jour le statut du dossier.' },
-        { status: 500 }
+        { status: 500 },
       )
     }
 
-    // ── 4. Log the decision in audit_trail ──────────────────────────────────
-    await admin
+    // ── 4. Log the decision in audit_trail (best-effort) ────────────────────
+    admin
       .from('audit_trail')
       .insert({
         applicant_id:    applicantId,
         admin_id:        user.id,
-        previous_status: previousStatus as any,
-        new_status:      status as any,
+        previous_status: previousStatus as never,
+        new_status:      status as never,
         notes:           conditionalMessage?.trim() ?? null,
       })
-      .then() // fire-and-forget; don't fail the request if this errors
+      .then()
 
-    // ── 5. Send decision notification email (fire-and-forget) ────────────────
-    sendDecisionNotification({
+    // ── 5. Send decision notification email — AWAITED ────────────────────────
+    // CRITICAL: must be awaited before returning the response.
+    // In Vercel serverless, fire-and-forget (.then()) is killed when the
+    // HTTP response is sent — the email would never go out.
+    const emailResult = await sendDecisionNotification({
       applicantId,
       status,
       conditionalMessage: conditionalMessage?.trim() ?? null,
-    }).then((result) => {
-      if (result.wasMock) {
-        console.warn('[admin/decision] email mock mode — set RESEND_API_KEY in Vercel env')
-      } else if (!result.sent) {
-        console.error('[admin/decision] email send failed:', result.error)
-      } else {
-        console.log(`[admin/decision] ✓ decision email sent for ${applicantId}`)
-      }
-    }).catch((err) => console.error('[admin/decision] email unexpected error:', err))
+    })
 
-    return NextResponse.json({ success: true, updated })
+    console.log(`[admin/decision] email result for ${applicantId}:`, emailResult)
+
+    return NextResponse.json({
+      success:    true,
+      updated,
+      emailSent:  emailResult.sent,
+      emailMock:  emailResult.wasMock,
+      emailError: emailResult.error ?? null,
+    })
 
   } catch (err) {
     console.error('[admin/decision] unexpected error:', err)
     return NextResponse.json(
       { error: 'Erreur serveur inattendue.' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
