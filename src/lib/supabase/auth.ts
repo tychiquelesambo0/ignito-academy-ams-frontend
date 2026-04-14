@@ -37,7 +37,7 @@ export async function signUpApplicant(data: SignUpData): Promise<AuthResponse> {
     email: data.email,
     password: data.password,
     options: {
-      emailRedirectTo: `${window.location.origin}/dashboard`,
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
       data: {
         prenom: data.prenom,
         nom: data.nom,
@@ -108,7 +108,7 @@ export async function resetPassword(
   const supabase = createClient()
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password`,
+    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
   })
 
   return { error }
