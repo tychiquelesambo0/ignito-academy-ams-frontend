@@ -46,7 +46,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             priority
           />
           <span className="font-serif text-[13px] font-semibold tracking-widest text-white/65">
-            Admitta
+            ADMITTA
           </span>
 
           {/* Close button — mobile only, pinned top-right */}

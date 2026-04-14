@@ -83,7 +83,7 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
       >
 
         {/* ── Logo row ─────────────────────────────────────────────────────── */}
-        <div className="relative flex shrink-0 flex-col items-center justify-center gap-2 border-b border-white/10 px-5 py-5">
+        <div className="relative flex shrink-0 flex-col items-center justify-center gap-2 border-b border-white/10 px-4 py-5">
           <Image
             src="/ignito-logo-white.svg"
             alt="Ignito Academy"
@@ -93,7 +93,7 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
             priority
           />
           <span className="font-serif text-[13px] font-semibold tracking-widest text-white/65">
-            Admitta
+            ADMITTA
           </span>
 
           {/* Close button — mobile only, pinned top-right */}
@@ -257,7 +257,7 @@ export default function DashboardSidebar({ isOpen, onClose }: Props) {
         </nav>
 
         {/* ── Footer ───────────────────────────────────────────────────────── */}
-        <div className="shrink-0 border-t border-white/10 px-5 py-4">
+        <div className="shrink-0 border-t border-white/10 px-4 py-4">
           <p className="text-[10px] leading-snug text-white/30">
             © 2026 Ignito Academy. Tous droits réservés.
           </p>
