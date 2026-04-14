@@ -18,7 +18,7 @@ function ConfirmEmailContent() {
         <div className="absolute inset-0 opacity-5"
           style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, #4EA6F5 0%, transparent 60%)' }} />
         <div className="relative z-10 flex flex-col h-full p-12">
-          <Link href="/" className="inline-flex items-center gap-2 group">
+          <Link href="https://ignitoacademy.com" className="inline-flex items-center gap-2 group">
             <span className="text-white/45 text-xs font-medium tracking-widest uppercase group-hover:text-white/70 transition-colors">
               Retour
             </span>

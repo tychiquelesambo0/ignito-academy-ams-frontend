@@ -494,7 +494,7 @@ function AdmittaGateway() {
 
           {/* Back link */}
           <div>
-            <Link href="/" className="inline-flex items-center gap-2 group min-h-[44px]">
+            <Link href="https://ignitoacademy.com" className="inline-flex items-center gap-2 group min-h-[44px]">
               <ArrowLeft className="w-3.5 h-3.5 text-white/40 group-hover:text-white/70 transition-colors" />
               <span className="text-white/45 text-xs font-medium tracking-widest uppercase group-hover:text-white/70 transition-colors">
                 Retour
@@ -563,7 +563,7 @@ function AdmittaGateway() {
         <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-gray-100">
           <span className="font-serif text-xl font-bold text-[#021463]">Admitta</span>
           <Link
-            href="/"
+            href="https://ignitoacademy.com"
             className="flex items-center gap-1.5 text-sm text-[#021463]/55 hover:text-[#021463] transition-colors min-h-[44px] px-2"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
