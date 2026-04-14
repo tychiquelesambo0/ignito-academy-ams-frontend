@@ -6,7 +6,7 @@
 import { Resend } from 'resend'
 
 const appBaseUrl = () =>
-  (process.env.NEXT_PUBLIC_APP_URL ?? 'https://ignitoacademy.com').replace(/\/$/, '')
+  (process.env.NEXT_PUBLIC_APP_URL ?? 'https://admissions.ignitoacademy.com').replace(/\/$/, '')
 
 function escapeHtml(s: string): string {
   return s
@@ -103,7 +103,7 @@ export async function sendDocumentRequestEmail(opts: {
 
   try {
     const resend    = new Resend(resendKey)
-    const fromEmail = process.env.FROM_EMAIL?.trim() || 'Ignito Academy <admin@ignitoacademy.com>'
+    const fromEmail = process.env.FROM_EMAIL?.trim() || 'Ignito Academy <admissions@ignitoacademy.com>'
     const { data, error } = await resend.emails.send({
       from:    fromEmail,
       to:      [opts.to],
