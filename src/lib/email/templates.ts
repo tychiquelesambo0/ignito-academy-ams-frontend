@@ -6,6 +6,9 @@
 // Production base URL — resolves to https://admissions.ignitoacademy.com in Vercel
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://admissions.ignitoacademy.com').replace(/\/$/, '')
 
+// Publicly hosted alternative logo (served from the AMS /public folder)
+const LOGO_URL = `${APP_URL}/ignito-logo-alt.svg`
+
 // ─── Shared layout wrapper ─────────────────────────────────────────────────────
 
 function layout(opts: {
@@ -20,8 +23,13 @@ function layout(opts: {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>${opts.headerTitle}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+    h1,h2,h3 { font-family:'Crimson Pro',Georgia,'Times New Roman',serif !important; }
+    p,td,li,span,a { font-family:'Inter',Arial,sans-serif !important; }
+  </style>
 </head>
-<body style="margin:0;padding:0;background:#F8FAFC;font-family:Georgia,'Times New Roman',serif;">
+<body style="margin:0;padding:0;background:#F8FAFC;font-family:'Inter',Arial,sans-serif;">
 
   <!-- Preheader (hidden) -->
   <span style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${opts.preheader}</span>
@@ -31,13 +39,13 @@ function layout(opts: {
       <table width="600" cellpadding="0" cellspacing="0"
         style="background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;max-width:600px;width:100%;">
 
-        <!-- Header -->
+        <!-- Header — white background with logo -->
         <tr>
-          <td style="background:#021463;padding:28px 40px;">
-            <p style="margin:0;color:#ffffff;font-family:Georgia,serif;font-size:22px;
-                      font-weight:bold;letter-spacing:0.5px;">IGNITO ACADEMY</p>
-            <p style="margin:4px 0 0;color:rgba(255,255,255,0.55);font-family:Arial,sans-serif;
-                      font-size:11px;letter-spacing:1px;text-transform:uppercase;">
+          <td style="background:#ffffff;padding:28px 40px 24px;border-bottom:3px solid #021463;text-align:center;">
+            <img src="${LOGO_URL}" alt="Ignito Academy" width="180" height="auto"
+                 style="display:block;margin:0 auto;max-width:180px;height:auto;" />
+            <p style="margin:10px 0 0;font-family:'Inter',Arial,sans-serif;font-size:10px;
+                      color:#94a3b8;letter-spacing:1.5px;text-transform:uppercase;">
               ${opts.headerSubtitle}
             </p>
           </td>
@@ -53,7 +61,7 @@ function layout(opts: {
         <!-- Footer -->
         <tr>
           <td style="padding:20px 40px;background:#f1f5f9;border-top:1px solid #e2e8f0;">
-            <p style="margin:0;font-family:Arial,sans-serif;font-size:11px;
+            <p style="margin:0;font-family:'Inter',Arial,sans-serif;font-size:11px;
                       color:#94a3b8;text-align:center;line-height:1.6;">
               © 2026 Ignito Academy. Tous droits réservés.<br />
               Kinshasa, République Démocratique du Congo<br />
@@ -78,7 +86,7 @@ function idBox(applicantId: string): string {
     style="background:#F8FAFC;border:1px solid #e2e8f0;border-left:4px solid #4EA6F5;
            border-radius:6px;margin:0 0 24px;">
     <tr><td style="padding:14px 20px;">
-      <p style="margin:0;font-family:Arial,sans-serif;font-size:10px;color:#94a3b8;
+      <p style="margin:0;font-family:'Inter',Arial,sans-serif;font-size:10px;color:#94a3b8;
                 text-transform:uppercase;letter-spacing:1px;">Identifiant de candidature</p>
       <p style="margin:4px 0 0;font-family:'Courier New',monospace;font-size:18px;
                 font-weight:bold;color:#021463;">${applicantId}</p>
@@ -90,10 +98,10 @@ function idBox(applicantId: string): string {
 
 function signOff(): string {
   return `
-  <p style="margin:24px 0 0;font-size:13px;color:#334155;line-height:1.7;font-family:Georgia,serif;">
+  <p style="margin:24px 0 0;font-size:13px;color:#334155;line-height:1.7;
+            font-family:'Inter',Arial,sans-serif;">
     Veuillez agréer, Madame / Monsieur, l'expression de nos salutations académiques distinguées.<br /><br />
-    <strong>Tychique Lesambo</strong><br />
-    <span style="color:#64748b;font-family:Arial,sans-serif;font-size:12px;">Directeur Académique — Ignito Academy</span>
+    <strong style="color:#021463;">Bureau d'admissions — Ignito Academy</strong>
   </p>`
 }
 
@@ -113,15 +121,15 @@ export function paymentConfirmationEmail(opts: {
   const body = `
     <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:11px;color:#94a3b8;
               text-transform:uppercase;letter-spacing:1px;">Confirmation de paiement</p>
-    <h1 style="margin:0 0 24px;font-family:Georgia,serif;font-size:24px;color:#021463;">
+    <h1 style="margin:0 0 24px;font-family:'Crimson Pro',Georgia,serif;font-size:26px;color:#021463;">
       Votre dossier est en cours d'évaluation
     </h1>
 
-    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;">
+    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;font-family:'Inter',Arial,sans-serif;">
       Madame / Monsieur <strong>${opts.prenom} ${opts.nom}</strong>,
     </p>
 
-    <p style="margin:0 0 20px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 20px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Nous accusons bonne réception de votre règlement des frais d'étude de dossier d'un montant
       de <strong>${opts.amount}</strong>, effectué le <strong>${dateStr}</strong>.
     </p>
@@ -143,7 +151,7 @@ export function paymentConfirmationEmail(opts: {
       </td></tr>
     </table>
 
-    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Votre dossier est désormais transmis à la Commission des Admissions pour évaluation.
       Vous serez informé(e) de la décision finale par voie électronique dans les meilleurs délais.
     </p>
@@ -177,11 +185,11 @@ export function finalAcceptanceEmail(opts: {
   const body = `
     <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:11px;color:#94a3b8;
               text-transform:uppercase;letter-spacing:1px;">Décision d'admission</p>
-    <h1 style="margin:0 0 24px;font-family:Georgia,serif;font-size:24px;color:#021463;">
+    <h1 style="margin:0 0 24px;font-family:'Crimson Pro',Georgia,serif;font-size:26px;color:#021463;">
       Félicitations — Admission définitive
     </h1>
 
-    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;">
+    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;font-family:'Inter',Arial,sans-serif;">
       Madame / Monsieur <strong>${opts.prenom} ${opts.nom}</strong>,
     </p>
 
@@ -198,20 +206,20 @@ export function finalAcceptanceEmail(opts: {
 
     ${idBox(opts.applicantId)}
 
-    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       C'est avec un immense plaisir que le Comité des Admissions vous annonce votre admission
       définitive à l'<strong>Année Préparatoire</strong> au sein d'Ignito Academy pour la
       rentrée de <strong>Septembre 2026</strong>.
     </p>
 
-    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Votre parcours académique a démontré le potentiel nécessaire pour exceller dans le système
       universitaire britannique. Cette offre marque le début de votre parcours continu de 4 ans
       vers l'obtention de votre <strong>Licence Britannique (Bachelor's Degree)</strong>, reconnue
       selon le cadre d'excellence britannique (RQF).
     </p>
 
-    <p style="margin:0 0 24px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 24px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Votre lettre d'admission officielle est disponible en téléchargement sur votre portail.
       Veuillez vous connecter au portail
       <a href="${APP_URL}/dashboard" style="color:#021463;font-weight:bold;">Admitta</a>
@@ -242,23 +250,23 @@ export function conditionalAcceptanceEmail(opts: {
   const body = `
     <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:11px;color:#94a3b8;
               text-transform:uppercase;letter-spacing:1px;">Décision d'admission</p>
-    <h1 style="margin:0 0 24px;font-family:Georgia,serif;font-size:24px;color:#021463;">
+    <h1 style="margin:0 0 24px;font-family:'Crimson Pro',Georgia,serif;font-size:26px;color:#021463;">
       Offre d'admission sous réserve
     </h1>
 
-    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;">
+    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;font-family:'Inter',Arial,sans-serif;">
       Madame / Monsieur <strong>${opts.prenom} ${opts.nom}</strong>,
     </p>
 
     ${idBox(opts.applicantId)}
 
-    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Suite à l'évaluation rigoureuse de votre candidature, le Comité des Admissions a le plaisir
       de vous proposer une <strong>offre d'admission sous réserve</strong> pour l'<strong>Année
       Préparatoire</strong> au sein d'Ignito Academy pour la rentrée de Septembre 2026.
     </p>
 
-    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Votre profil académique correspond à nos standards d'excellence. Cependant, votre admission
       définitive est subordonnée à la réception des éléments suivants :
     </p>
@@ -278,7 +286,7 @@ export function conditionalAcceptanceEmail(opts: {
       </td></tr>
     </table>
 
-    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Vous disposez d'un délai limité pour soumettre ces documents directement sur le portail
       <a href="${APP_URL}" style="color:#021463;font-weight:bold;">Admitta</a>.
       Dès leur validation par le Comité, votre statut passera automatiquement en
@@ -313,17 +321,17 @@ export function documentsSubmittedEmail(opts: {
   const body = `
     <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:11px;color:#94a3b8;
               text-transform:uppercase;letter-spacing:1px;">Confirmation de dépôt</p>
-    <h1 style="margin:0 0 24px;font-family:Georgia,serif;font-size:24px;color:#021463;">
+    <h1 style="margin:0 0 24px;font-family:'Crimson Pro',Georgia,serif;font-size:26px;color:#021463;">
       Vos documents ont bien été reçus
     </h1>
 
-    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;">
+    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;font-family:'Inter',Arial,sans-serif;">
       Madame / Monsieur <strong>${opts.prenom} ${opts.nom}</strong>,
     </p>
 
     ${idBox(opts.applicantId)}
 
-    <p style="margin:0 0 20px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 20px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Nous accusons bonne réception de vos pièces justificatives. Votre dossier est désormais
       complet et prêt pour l'étape de paiement des frais d'étude de dossier.
     </p>
@@ -373,29 +381,29 @@ export function refusalEmail(opts: {
   const body = `
     <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:11px;color:#94a3b8;
               text-transform:uppercase;letter-spacing:1px;">Décision d'admission</p>
-    <h1 style="margin:0 0 24px;font-family:Georgia,serif;font-size:24px;color:#1e293b;">
+    <h1 style="margin:0 0 24px;font-family:'Crimson Pro',Georgia,serif;font-size:26px;color:#1e293b;">
       Mise à jour de votre dossier
     </h1>
 
-    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;">
+    <p style="margin:0 0 16px;font-size:15px;color:#1e293b;line-height:1.7;font-family:'Inter',Arial,sans-serif;">
       Madame / Monsieur <strong>${opts.prenom} ${opts.nom}</strong>,
     </p>
 
     ${idBox(opts.applicantId)}
 
-    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Le Comité des Admissions vous remercie de l'intérêt que vous portez à Ignito Academy.
       Nous avons étudié votre dossier avec la plus grande attention et le plus grand soin.
     </p>
 
-    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 16px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Le nombre de places pour notre cohorte de <strong>Septembre 2026</strong> étant strictement
       limité, notre processus de sélection s'est révélé particulièrement compétitif cette année.
       C'est avec regret que nous ne pouvons pas, à ce stade, vous offrir une place au sein de
       notre programme.
     </p>
 
-    <p style="margin:0 0 24px;font-size:14px;color:#334155;line-height:1.8;">
+    <p style="margin:0 0 24px;font-size:14px;color:#334155;line-height:1.8;font-family:'Inter',Arial,sans-serif;">
       Cette décision ne remet nullement en cause vos qualités personnelles ni votre potentiel
       académique. Nous vous souhaitons une excellente continuation et beaucoup de succès dans
       vos futurs projets universitaires.
