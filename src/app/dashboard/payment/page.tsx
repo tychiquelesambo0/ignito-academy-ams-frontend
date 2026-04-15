@@ -38,10 +38,7 @@ import type { Application, Applicant } from '@/lib/context/ApplicationContext'
 import { useApplicationSteps } from '@/lib/hooks/useApplicationSteps'
 import StepGate from '@/components/dashboard/StepGate'
 import BackButton from '@/components/dashboard/BackButton'
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const ADMISSION_FEE_USD = 1 // TEMP: restore to 29 before launch
+import { APPLICATION_FEE_USD as ADMISSION_FEE_USD } from '@/lib/payment/currency'
 
 type ProviderOption = 'M-Pesa' | 'Orange Money' | 'Airtel Money'
 type PaymentScreenState = 'idle' | 'processing' | 'awaiting' | 'confirmed' | 'failed'
