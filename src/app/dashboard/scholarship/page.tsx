@@ -108,50 +108,78 @@ function PaymentPendingView() {
 
 function NotEligibleView() {
   return (
-    <div className="rounded-lg bg-white p-8 shadow-sm">
+    <div className="rounded-lg bg-white p-8 shadow-sm space-y-6">
       <div className="flex flex-col items-center text-center">
         <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-lg bg-slate-100">
           <XCircle className="h-7 w-7 text-slate-400" />
         </div>
-        <h2 className="font-serif text-xl font-semibold text-slate-800">
-          Bourse d'Excellence — Non éligible
+        <h2 className="font-serif text-2xl font-semibold text-[#021463]">
+          Profil Non Éligible à la Bourse
         </h2>
-        <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-500">
-          Votre dossier académique ne satisfait pas les critères d'éligibilité
-          de la Bourse d'Excellence pour la promotion 2026.
+        <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-600">
+          Après une analyse rigoureuse de vos données académiques, le comité vous informe que
+          votre profil ne répond pas à l&apos;intégralité des critères stricts exigés pour la
+          Bourse d&apos;Excellence de cette session.
         </p>
       </div>
 
-      <div className="mt-8 rounded-md border border-slate-100 bg-slate-50 p-5 space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Critères d'éligibilité
+      <div className="rounded-md border border-slate-100 bg-slate-50 p-5 space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+          Conditions Préalables d&apos;Examen
         </p>
-        <ul className="space-y-2 text-sm text-slate-600">
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5 h-4 w-4 shrink-0 text-slate-300">•</span>
-            Moyenne générale ≥ 70 % en Terminale (Grade 12)
+        <ul className="space-y-2.5 text-sm text-slate-600">
+          <li className="flex items-start gap-2.5">
+            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#4EA6F5]" />
+            <span>
+              <strong className="font-semibold text-slate-700">Excellence Académique :</strong>{' '}
+              Moyenne générale minimale de 70% exigée pour les classes de 10ème, 11ème, 12ème année,
+              ainsi qu&apos;à l&apos;Examen d&apos;État.
+            </span>
           </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5 h-4 w-4 shrink-0 text-slate-300">•</span>
-            Résultats EXETAT ≥ 70 %
+          <li className="flex items-start gap-2.5">
+            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#4EA6F5]" />
+            <span>
+              <strong className="font-semibold text-slate-700">Critère d&apos;Âge :</strong>{' '}
+              Être âgé(e) de strictement moins de 20 ans au 1er septembre 2026.
+            </span>
           </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5 h-4 w-4 shrink-0 text-slate-300">•</span>
-            Dossier de candidature complet et paiement confirmé
+          <li className="flex items-start gap-2.5">
+            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#4EA6F5]" />
+            <span>
+              <strong className="font-semibold text-slate-700">Cohorte de Graduation :</strong>{' '}
+              Avoir obtenu son Diplôme d&apos;État en 2024, 2025 ou 2026.
+            </span>
           </li>
         </ul>
       </div>
 
-      <p className="mt-6 text-center text-xs text-slate-400">
-        Si vous pensez qu'il y a une erreur, contactez notre équipe à{' '}
-        <a
-          href="mailto:admissions@ignitoacademy.com"
-          className="text-[#4EA6F5] hover:underline"
+      <div className="rounded-md border border-[#4EA6F5]/20 bg-[#4EA6F5]/5 p-5">
+        <p className="text-sm leading-relaxed text-slate-600">
+          Toutefois, votre excellence demeure. Votre dossier d&apos;admission standard reste actif,
+          et nous vous encourageons vivement à poursuivre votre inscription pour intégrer notre
+          prestigieux cursus universitaire.
+        </p>
+      </div>
+
+      <div className="flex flex-col items-center gap-3 pt-2">
+        <Link
+          href="/dashboard"
+          className="inline-flex h-11 items-center gap-2 rounded-md bg-[#021463]
+                     px-6 text-sm font-semibold text-white transition-colors hover:bg-[#021463]/90"
         >
-          admissions@ignitoacademy.com
-        </a>
-        .
-      </p>
+          Retourner au Tableau de Bord
+          <ChevronRight className="h-4 w-4" />
+        </Link>
+        <p className="text-xs text-slate-400">
+          Une erreur ?{' '}
+          <a
+            href="mailto:admissions@ignitoacademy.com"
+            className="text-[#4EA6F5] hover:underline"
+          >
+            admissions@ignitoacademy.com
+          </a>
+        </p>
+      </div>
     </div>
   )
 }
@@ -174,12 +202,12 @@ function SubmittedView({ videoUrl }: { videoUrl: string }) {
         </div>
         <div>
           <p className="font-serif text-base font-semibold text-slate-800">
-            Plaidoyer Transmis avec Succès
+            Plaidoyer Transmis au Comité
           </p>
           <p className="mt-0.5 text-sm leading-relaxed text-slate-500">
-            Votre vidéo a été sécurisée et transmise au comité académique. Les résultats
-            d&apos;attribution de la Bourse d&apos;Excellence vous seront communiqués à l&apos;issue
-            des délibérations.
+            Votre vidéo a été sécurisée et transmise au comité académique d&apos;Ignito Academy.
+            Les délibérations pour les 20 bourses d&apos;excellence sont en cours. Les résultats
+            officiels vous seront communiqués à l&apos;issue de cette session d&apos;évaluation.
           </p>
         </div>
       </div>
@@ -266,9 +294,9 @@ function RejectedView() {
         Candidature non retenue
       </h2>
       <p className="mx-auto max-w-sm text-sm leading-relaxed text-slate-500">
-        Nous vous remercions pour votre candidature à la Bourse d'Excellence.
-        Malheureusement, votre dossier n'a pas été retenu pour cette promotion.
-        Votre admission au UK Level 3 Foundation Diploma reste confirmée.
+        Nous vous remercions pour votre candidature à la Bourse d&apos;Excellence.
+        À l&apos;issue des délibérations, votre dossier n&apos;a pas été retenu pour cette session.
+        Votre admission au cursus universitaire reste pleinement confirmée.
       </p>
       <p className="text-xs text-slate-400">
         Pour toute question :{' '}
@@ -432,12 +460,62 @@ export default function ScholarshipPage() {
       {/* Eligibility banner */}
       <EligibilityBanner />
 
-      {/* Instructions card */}
-      <div className="rounded-lg bg-white p-6 shadow-sm space-y-3">
+      {/* Evaluation criteria card */}
+      <div className="rounded-lg bg-white p-6 shadow-sm space-y-4">
         <div className="flex items-start gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center
                           rounded-md bg-[#031463]/8">
             <Award className="h-5 w-5 text-[#031463]" />
+          </div>
+          <div>
+            <h2 className="font-serif text-lg font-semibold text-slate-800">
+              Évaluation d&apos;Éligibilité : Bourse d&apos;Excellence
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-slate-500">
+              L&apos;admission à notre programme de bourse est hautement sélective. Elle est
+              réservée aux candidats démontrant un parcours académique exceptionnel et un potentiel
+              de leadership avéré pour intégrer notre cohorte d&apos;élite.
+            </p>
+          </div>
+        </div>
+
+        <div className="ml-12 space-y-1 pb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2.5">
+            Conditions Préalables d&apos;Examen :
+          </p>
+          <ul className="space-y-2.5 text-sm text-slate-600">
+            <li className="flex items-start gap-2.5">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#4EA6F5]" />
+              <span>
+                <strong className="font-semibold text-slate-700">Excellence Académique :</strong>{' '}
+                Moyenne générale minimale de 70% exigée continuellement pour les classes de
+                10ème, 11ème, 12ème année, ainsi qu&apos;à l&apos;Examen d&apos;État.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#4EA6F5]" />
+              <span>
+                <strong className="font-semibold text-slate-700">Critère d&apos;Âge :</strong>{' '}
+                Être âgé(e) de strictement moins de 20 ans au 1er septembre 2026.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#4EA6F5]" />
+              <span>
+                <strong className="font-semibold text-slate-700">Cohorte de Graduation :</strong>{' '}
+                Avoir obtenu son Diplôme d&apos;État en 2024, 2025 ou 2026.
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Video plaidoyer card */}
+      <div className="rounded-lg bg-white p-6 shadow-sm space-y-3">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center
+                          rounded-md bg-[#031463]/8">
+            <Play className="h-5 w-5 text-[#031463]" />
           </div>
           <div>
             <h2 className="font-serif text-lg font-semibold text-slate-800">
@@ -447,7 +525,7 @@ export default function ScholarshipPage() {
               Au-delà des relevés de notes, notre comité d&apos;admission recherche des esprits
               visionnaires. Dans une vidéo de deux minutes, présentez vos ambitions, votre vision
               du leadership, et démontrez en quoi vous incarnerez l&apos;excellence de notre cohorte
-              pour le UK Level 3 Foundation Diploma.
+              universitaire.
             </p>
           </div>
         </div>
@@ -553,7 +631,7 @@ export default function ScholarshipPage() {
               Transmission en cours...
             </span>
           ) : (
-            'Soumettre ma candidature à la Bourse'
+            'Soumettre mon profil à l\'évaluation académique'
           )}
         </button>
       </div>
