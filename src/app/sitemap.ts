@@ -1,12 +1,14 @@
 import type { MetadataRoute } from "next"
 
+const BASE_URL = "https://admissions.ignitoacademy.com"
+
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: "https://admissions.ignitoacademy.com/apply",
+      url: `${BASE_URL}/apply`,
       lastModified: new Date(),
       changeFrequency: "monthly",
-      priority: 0.8,
+      priority: 1.0,
     },
   ]
 }
