@@ -5,6 +5,7 @@ import {
   type ApplicationStatus,
   type PaymentStatus,
 } from '@/lib/status-machine'
+import { rateLimit, getClientIp, UPLOAD_RATE_LIMIT } from '@/lib/security/rate-limit'
 
 const MAX_FILE_SIZE = 5_242_880 // 5 MB
 const ACCEPTED_MIME_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
@@ -24,6 +25,24 @@ type DocumentType = (typeof VALID_DOCUMENT_TYPES)[number]
 
 export async function POST(request: NextRequest) {
   try {
+    // ── Rate limiting ──────────────────────────────────────────────────────
+    const ip = getClientIp(request)
+    const rl = rateLimit(`document-upload:${ip}`, UPLOAD_RATE_LIMIT)
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Trop de téléversements. Veuillez patienter avant de réessayer.' },
+        {
+          status: 429,
+          headers: {
+            'Retry-After':           String(Math.ceil((rl.resetAt - Date.now()) / 1000)),
+            'X-RateLimit-Limit':     String(UPLOAD_RATE_LIMIT.limit),
+            'X-RateLimit-Remaining': String(rl.remaining),
+            'X-RateLimit-Reset':     String(rl.resetAt),
+          },
+        },
+      )
+    }
+
     const formData = await request.formData()
     const file         = formData.get('file')         as File
     const applicantId  = formData.get('applicantId')  as string

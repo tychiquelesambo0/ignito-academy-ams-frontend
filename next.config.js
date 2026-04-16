@@ -38,14 +38,46 @@ const nextConfig = {
 
   // Security headers (also applied via vercel.json for CDN-level enforcement)
   async headers() {
+    // Content Security Policy
+    // NOTE: Next.js App Router requires 'unsafe-inline' for scripts because it
+    // injects inline hydration scripts that cannot be nonce-controlled without
+    // a custom server. 'unsafe-eval' is needed by some Next.js internals in dev.
+    // All other directives are strict.
+    const csp = [
+      "default-src 'self'",
+      // Next.js requires unsafe-inline for hydration; unsafe-eval only in dev
+      process.env.NODE_ENV === 'development'
+        ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+        : "script-src 'self' 'unsafe-inline'",
+      // Tailwind JIT generates inline styles
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com data:",
+      // Allow Supabase storage for document previews, placeholders, data URIs
+      "img-src 'self' data: blob: https://*.supabase.co https://via.placeholder.com",
+      // API calls: Supabase (REST + realtime websocket), Resend, PawaPay
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.resend.com https://api.pawapay.io https://api.sandbox.pawapay.io",
+      // Scholarship video pitches via YouTube / Vimeo iframes only (no file uploads)
+      "frame-src https://www.youtube.com https://player.vimeo.com https://www.youtube-nocookie.com",
+      // No plugins, no base-tag hijacking, no external form targets
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      // Stronger than X-Frame-Options — blocks all framing
+      "frame-ancestors 'none'",
+      // Force HTTPS for all sub-resources in production
+      ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
+    ].join('; ')
+
     return [
       {
         source: '/(.*)',
         headers: [
-          { key: 'X-Content-Type-Options',  value: 'nosniff' },
-          { key: 'X-Frame-Options',         value: 'DENY' },
-          { key: 'X-XSS-Protection',        value: '1; mode=block' },
-          { key: 'Referrer-Policy',         value: 'strict-origin-when-cross-origin' },
+          { key: 'Content-Security-Policy',  value: csp },
+          { key: 'X-Content-Type-Options',   value: 'nosniff' },
+          { key: 'X-Frame-Options',          value: 'DENY' },
+          { key: 'X-XSS-Protection',         value: '1; mode=block' },
+          { key: 'Referrer-Policy',          value: 'strict-origin-when-cross-origin' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           {
             key:   'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',

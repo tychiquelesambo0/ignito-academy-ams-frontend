@@ -20,6 +20,7 @@ import { getPaymentProvider } from '@/lib/payment'
 import { APPLICATION_FEE_USD } from '@/lib/payment/currency'
 import { sendEmailWithRetry } from '@/lib/email/send-with-retry'
 import { paymentConfirmationEmail } from '@/lib/email/templates'
+import { rateLimit, getClientIp, PAYMENT_RATE_LIMIT } from '@/lib/security/rate-limit'
 
 interface PaymentInitiationRequest {
   applicantId: string
@@ -29,6 +30,24 @@ interface PaymentInitiationRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // ── Rate limiting ──────────────────────────────────────────────────────
+    const ip  = getClientIp(request)
+    const rl  = rateLimit(`payment-initiate:${ip}`, PAYMENT_RATE_LIMIT)
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Trop de tentatives. Veuillez patienter avant de réessayer.' },
+        {
+          status: 429,
+          headers: {
+            'Retry-After':           String(Math.ceil((rl.resetAt - Date.now()) / 1000)),
+            'X-RateLimit-Limit':     String(PAYMENT_RATE_LIMIT.limit),
+            'X-RateLimit-Remaining': String(rl.remaining),
+            'X-RateLimit-Reset':     String(rl.resetAt),
+          },
+        },
+      )
+    }
+
     const body: PaymentInitiationRequest = await request.json()
     const { applicantId, provider, phoneNumber } = body
 

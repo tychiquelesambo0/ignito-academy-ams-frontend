@@ -38,6 +38,8 @@ type SortDir = 'asc' | 'desc'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
+const PAGE_SIZE = 25  // rows per page in the admin table
+
 const DECISION_STATUSES = ['Admission sous réserve', 'Admission définitive', 'Dossier refusé']
 
 const APP_STATUS_LABELS: Record<string, string> = {
@@ -158,6 +160,7 @@ export default function AdminDashboardPage() {
   const [filterExam, setFilterExam] = useState('')
   const [sortKey,    setSortKey]    = useState<SortKey | null>(null)
   const [sortDir,    setSortDir]    = useState<SortDir>('asc')
+  const [currentPage, setCurrentPage] = useState(1)
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
 
@@ -264,6 +267,12 @@ export default function AdminDashboardPage() {
   const clearFilters = () => {
     setSearch(''); setFilterApp(''); setFilterPay(''); setFilterExam('')
   }
+
+  // Reset to first page whenever filters, search, or sort change
+  useEffect(() => { setCurrentPage(1) }, [search, filterApp, filterPay, filterExam, sortKey, sortDir])
+
+  const totalPages  = Math.ceil(displayed.length / PAGE_SIZE)
+  const pagedRows   = displayed.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -495,7 +504,7 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {displayed.map(app => (
+                {pagedRows.map(app => (
                   <tr key={app.applicant_id}
                       className="transition-colors hover:bg-slate-50/50">
                     <td className="px-4 py-3.5">
@@ -553,12 +562,60 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Pagination hint */}
-        {apps.length > 0 && (
-          <div className="border-t border-slate-100 px-6 py-3">
-            <p className="text-[11px] text-slate-400">
-              {apps.length} candidature{apps.length !== 1 ? 's' : ''} au total — affichées par ordre d&apos;inscription (plus récente en premier).
+        {/* Pagination footer */}
+        {displayed.length > 0 && (
+          <div className="flex items-center justify-between border-t border-slate-100 px-6 py-3 gap-4 flex-wrap">
+            <p className="text-[11px] text-slate-400 shrink-0">
+              {displayed.length === apps.length
+                ? `${apps.length} candidature${apps.length !== 1 ? 's' : ''} au total`
+                : `${displayed.length} sur ${apps.length} candidature${apps.length !== 1 ? 's' : ''}`}
+              {totalPages > 1 && ` — page ${currentPage} sur ${totalPages}`}
             </p>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="flex h-7 w-7 items-center justify-center rounded border border-slate-200
+                             text-xs text-slate-500 transition-colors hover:border-[#4EA6F5]
+                             hover:text-[#4EA6F5] disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label="Page précédente"
+                >
+                  ‹
+                </button>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  // Show pages centred around currentPage
+                  const half  = 2
+                  let start   = Math.max(1, currentPage - half)
+                  const end   = Math.min(totalPages, start + 4)
+                  start       = Math.max(1, end - 4)
+                  return start + i
+                }).filter(p => p >= 1 && p <= totalPages).map(p => (
+                  <button
+                    key={p}
+                    onClick={() => setCurrentPage(p)}
+                    className={`flex h-7 w-7 items-center justify-center rounded border text-xs
+                                font-medium transition-colors
+                                ${p === currentPage
+                                  ? 'border-[#021463] bg-[#021463] text-white'
+                                  : 'border-slate-200 text-slate-500 hover:border-[#4EA6F5] hover:text-[#4EA6F5]'
+                                }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="flex h-7 w-7 items-center justify-center rounded border border-slate-200
+                             text-xs text-slate-500 transition-colors hover:border-[#4EA6F5]
+                             hover:text-[#4EA6F5] disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label="Page suivante"
+                >
+                  ›
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
