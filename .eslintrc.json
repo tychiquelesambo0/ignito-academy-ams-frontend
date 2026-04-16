@@ -15,6 +15,20 @@
         "selector": "Identifier[name=/OTHM/i]",
         "message": "OTHM keyword is strictly prohibited in variable/function names. Use alternative naming."
       }
-    ]
-  }
+    ],
+    "react/no-unescaped-entities": "off"
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/lib/validation/keywords.ts",
+        "src/lib/validation/schemas.ts",
+        "src/lib/validation/__tests__/**/*.ts",
+        "src/__tests__/property-p46-p65-four-pillars.test.ts"
+      ],
+      "rules": {
+        "no-restricted-syntax": "off"
+      }
+    }
+  ]
 }

@@ -361,6 +361,7 @@ export function DecisionLetterPDF({
 
         {/* ── Header ── */}
         <View style={s.header}>
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <Image src="/ignito-logo-pdf.png" style={s.logo} />
           <View style={s.headerRight}>
             <Text style={s.bureauLabel}>Bureau des Admissions</Text>
@@ -401,6 +402,7 @@ export function DecisionLetterPDF({
 
           <View style={s.signatureOuter}>
             <View style={s.signatureBlock}>
+              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image src="/signature-pdf.png" style={s.signatureImg} />
               <Text style={s.signatureName}>Tychique Lesambo</Text>
               <Text style={s.signatureTitle}>Directeur Académique</Text>
