@@ -148,11 +148,11 @@ describe('cross-template invariants', () => {
       refusalEmail(BASE_OPTS),
     ]
     templates.forEach(t => {
-      expect(t.html).toContain('IGNITO ACADEMY')
+      expect(t.html).toContain('Ignito Academy')
     })
   })
 
-  it('all templates include a signature from Tychique Lesambo', () => {
+  it('all templates include an institutional signature from the admissions bureau', () => {
     const templates = [
       paymentConfirmationEmail(PAYMENT_OPTS),
       finalAcceptanceEmail(BASE_OPTS),
@@ -160,7 +160,7 @@ describe('cross-template invariants', () => {
       refusalEmail(BASE_OPTS),
     ]
     templates.forEach(t => {
-      expect(t.html).toContain('Tychique Lesambo')
+      expect(t.html).toContain("Bureau d'admissions")
     })
   })
 })

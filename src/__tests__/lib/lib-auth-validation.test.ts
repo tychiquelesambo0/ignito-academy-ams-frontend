@@ -79,9 +79,9 @@ describe('registrationSchema — phone_number', () => {
     expect(r.success).toBe(true)
   })
 
-  it('rejects local format without country code', () => {
+  it('accepts local format without country code (0XXXXXXXXX — sanitized to E.164 before API call)', () => {
     const r = registrationSchema.safeParse({ ...VALID, phone_number: '0812345678' })
-    expect(r.success).toBe(false)
+    expect(r.success).toBe(true)
   })
 
   it('rejects wrong country code', () => {
