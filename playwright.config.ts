@@ -1,4 +1,24 @@
 import { defineConfig, devices } from '@playwright/test'
+import fs from 'fs'
+import path from 'path'
+
+// Load test-only credentials from .env.test.local (never committed to git).
+// This file holds E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD, E2E_TEST_EMAIL, etc.
+// We parse it manually so no external dependency (dotenv) is needed.
+const testEnvFile = path.resolve(__dirname, '.env.test.local')
+if (fs.existsSync(testEnvFile)) {
+  const lines = fs.readFileSync(testEnvFile, 'utf-8').split('\n')
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue
+    const eqIdx = trimmed.indexOf('=')
+    if (eqIdx > 0) {
+      const key = trimmed.slice(0, eqIdx).trim()
+      const val = trimmed.slice(eqIdx + 1).trim()
+      if (key && !(key in process.env)) process.env[key] = val
+    }
+  }
+}
 
 /**
  * Playwright E2E configuration for Ignito Academy AMS.

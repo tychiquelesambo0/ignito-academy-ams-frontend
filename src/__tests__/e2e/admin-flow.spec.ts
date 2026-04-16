@@ -7,16 +7,33 @@
  *   5. Selecting "Admission sous réserve" reveals mandatory message textarea
  *
  * Run: npm run test:e2e -- --grep "Admin flow"
+ *
+ * CREDENTIALS
+ * -----------
+ * Set the following environment variables (e.g. in .env.test.local) to run
+ * the admin login tests against your Supabase instance:
+ *
+ *   E2E_ADMIN_EMAIL=your-admin@ignitoacademy.com
+ *   E2E_ADMIN_PASSWORD=YourAdminPassword
+ *
+ * If either variable is absent the entire describe block is skipped cleanly.
  */
 
 import { test, expect } from '@playwright/test'
 
-const ADMIN_EMAIL    = 'admin@ignitoacademy.cd'
-const ADMIN_PASSWORD = 'IgnitoAdmin2026#'
+const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL    ?? ''
+const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? ''
 
 test.describe('Admin flow', () => {
 
   test.beforeEach(async ({ page }) => {
+    // Skip every test in this suite when credentials are not configured.
+    // test.skip() called inside beforeEach skips the current test.
+    test.skip(
+      !ADMIN_EMAIL || !ADMIN_PASSWORD,
+      'Admin credentials not configured — set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD env vars.'
+    )
+
     await page.goto('/admin/login')
     await page.getByLabel(/adresse email/i).fill(ADMIN_EMAIL)
     await page.getByLabel(/mot de passe/i).fill(ADMIN_PASSWORD)

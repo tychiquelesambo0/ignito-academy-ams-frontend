@@ -540,7 +540,7 @@ This document breaks down the implementation into manageable tasks organized by 
 - [x] 20.10 Test admin scholarship award ✅ (admin-flow.spec.ts)
 - [x] 20.11 Test on Chrome + Mobile Safari + Mobile Chrome ✅ (3 browser projects in playwright.config.ts)
 - [x] 20.12 Test responsive design (mobile/desktop) ✅ (iPhone 13 + Pixel 5 + Desktop Chrome projects)
-- [ ] 20.13 Run E2E suite against production (manual QA step — `npm run test:e2e`)
+- [x] 20.13 Run E2E suite against production ✅ — 21 passed / 9 skipped (all skips are intentional: 6 admin-detail tests skip when no applications are in the table, 3 payment-button tests skip outside CI). Exit code 0. Fixes applied: corrected selectors for /apply portal (button vs role=tab), added .env.test.local loader to playwright.config.ts, made admin/applicant credentials configurable via env vars.
 
 **Acceptance Criteria:**
 - Complete user journeys tested
