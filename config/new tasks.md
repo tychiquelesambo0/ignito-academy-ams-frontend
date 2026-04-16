@@ -417,8 +417,8 @@ This document breaks down the implementation into manageable tasks organized by 
 - [x] 16.3 Create admin-decision Edge Function (PDF generation) ✅ (supabase/functions/admin-decision — full PDF, email, audit trail)
 - [x] 16.4 Implement atomic operations with rollback ✅ (admin-decision uses RPC optimistic locking)
 - [x] 16.5 Add email sending via Resend ✅ (admin-decision + Next.js routes)
-- [ ] 16.6 Deploy Edge Functions to Supabase (manual step — run `supabase functions deploy`)
-- [ ] 16.7 Configure environment variables (manual step — set in Supabase dashboard)
+- [x] 16.6 Deploy Edge Functions to Supabase ✅ (admin-decision + scholarship-eligibility deployed via CLI)
+- [x] 16.7 Configure environment variables ✅ (RESEND_API_KEY, FROM_EMAIL set via `supabase secrets set`)
 - [ ] 16.8 Test Edge Functions (manual QA step)
 
 **Acceptance Criteria:**
