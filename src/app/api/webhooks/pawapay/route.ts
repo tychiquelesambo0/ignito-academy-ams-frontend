@@ -126,7 +126,50 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true }, { status: 200 })
   }
 
-  // ── 3. Look up the application ──────────────────────────────────────────────
+  // ── 3. Currency & amount validation (Task 15.3 / 15.4 — architectural pillar)
+  //
+  // PawaPay must ALWAYS return HTTP 200 (they retry on non-200 for 15 min).
+  // So we validate here and bail early WITHOUT updating the DB — effectively
+  // rejecting the payment without triggering infinite retries.
+  //
+  // Amount comparison: PawaPay sends the full decimal string ("29.00").
+  // In sandbox mode we allow any positive USD amount so QA tests can use $1.
+  if (currency !== 'USD') {
+    console.error(`[webhook/pawapay] ✗ REJECTED — non-USD currency: ${currency}. Pillar: USD-only.`)
+    await createAdminClient()
+      .from('webhook_logs')
+      .insert({
+        provider:     'pawapay',
+        event_type:   'deposit_callback_rejected',
+        payload:      payload,
+        status:       'rejected_currency',
+        processed_at: received,
+      })
+      .then(({ error }) => { if (error) console.warn('[webhook/pawapay] webhook_logs insert failed:', error.message) })
+    return NextResponse.json({ received: true }, { status: 200 })
+  }
+
+  const isSandbox    = (process.env.PAWAPAY_BASE_URL ?? '').includes('sandbox')
+  const amountFloat  = parseFloat(amount)
+
+  if (!isSandbox && amountFloat !== APPLICATION_FEE_USD) {
+    console.error(
+      `[webhook/pawapay] ✗ REJECTED — wrong amount: ${amount} USD (expected ${APPLICATION_FEE_USD}). Pillar: USD-only.`
+    )
+    await createAdminClient()
+      .from('webhook_logs')
+      .insert({
+        provider:     'pawapay',
+        event_type:   'deposit_callback_rejected',
+        payload:      payload,
+        status:       'rejected_amount',
+        processed_at: received,
+      })
+      .then(({ error }) => { if (error) console.warn('[webhook/pawapay] webhook_logs insert failed:', error.message) })
+    return NextResponse.json({ received: true }, { status: 200 })
+  }
+
+  // ── 4. Look up the application ──────────────────────────────────────────────
   const admin = createAdminClient()
 
   // Primary: match by transaction_id (the depositId we stored when initiating)
@@ -154,7 +197,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true }, { status: 200 })
   }
 
-  // ── 4. Idempotency — skip if already in final state ─────────────────────────
+  // ── 5. Idempotency — skip if already in final state ─────────────────────────
   if (
     application.payment_status === 'Confirmed' ||
     application.payment_status === 'Waived'
@@ -163,7 +206,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true }, { status: 200 })
   }
 
-  // ── 5. Update payment status ────────────────────────────────────────────────
+  // ── 6. Update payment status ────────────────────────────────────────────────
   if (status === 'COMPLETED') {
     const { error: updateError } = await admin
       .from('applications')
@@ -182,7 +225,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`[webhook/pawapay] ✓ payment_status → Confirmed for ${application.applicant_id}`)
 
-    // ── 6. Send confirmation email (fire-and-forget) ──────────────────────────
+    // ── 7. Send confirmation email (fire-and-forget) ──────────────────────────
     const { data: applicant } = await admin
       .from('applicants')
       .select('prenom, nom, email')
@@ -224,7 +267,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // ── 7. Log to webhook_logs (best-effort, don't fail if table missing) ────────
+  // ── 8. Log to webhook_logs (best-effort, don't fail if table missing) ────────
   await admin
     .from('webhook_logs')
     .insert({
