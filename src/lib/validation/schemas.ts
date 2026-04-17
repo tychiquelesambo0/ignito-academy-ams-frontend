@@ -73,7 +73,7 @@ export const textFieldSchema = (fieldName: string, maxLength: number = 255) =>
     .refine(
       (val) => !containsProhibitedKeyword(val),
       {
-        message: 'Le mot "OTHM" n\'est pas autorisé. Utilisez "UK Level 3 Foundation Diploma".',
+        message: 'Ce terme est réservé. Veuillez utiliser "UK Level 3 Foundation Diploma".',
       }
     )
 
@@ -87,7 +87,7 @@ export const optionalTextFieldSchema = (maxLength: number = 255) =>
     .refine(
       (val) => !val || !containsProhibitedKeyword(val),
       {
-        message: 'Le mot "OTHM" n\'est pas autorisé. Utilisez "UK Level 3 Foundation Diploma".',
+        message: 'Ce terme est réservé. Veuillez utiliser "UK Level 3 Foundation Diploma".',
       }
     )
     .optional()
@@ -136,7 +136,7 @@ export const profileSchema = z.object({
     .string()
     .max(255, "L'adresse ne peut pas dépasser 255 caractères")
     .refine((v) => !v || !containsProhibitedKeyword(v), {
-      message: 'Le mot "OTHM" n\'est pas autorisé.',
+      message: 'Ce terme est réservé. Veuillez utiliser "UK Level 3 Foundation Diploma".',
     })
     .optional()
     .or(z.literal('')),

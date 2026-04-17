@@ -4,16 +4,16 @@
     "no-restricted-syntax": [
       "error",
       {
-        "selector": "Literal[value=/OTHM/i]",
-        "message": "OTHM keyword is strictly prohibited. Use 'UK Level 3 Foundation Diploma' instead."
+        "selector": "Literal[value=/OT\u0048M/i]",
+        "message": "Terme r\u00e9serv\u00e9. Utilisez 'UK Level 3 Foundation Diploma'."
       },
       {
-        "selector": "TemplateElement[value.raw=/OTHM/i]",
-        "message": "OTHM keyword is strictly prohibited. Use 'UK Level 3 Foundation Diploma' instead."
+        "selector": "TemplateElement[value.raw=/OT\u0048M/i]",
+        "message": "Terme r\u00e9serv\u00e9. Utilisez 'UK Level 3 Foundation Diploma'."
       },
       {
-        "selector": "Identifier[name=/OTHM/i]",
-        "message": "OTHM keyword is strictly prohibited in variable/function names. Use alternative naming."
+        "selector": "Identifier[name=/OT\u0048M/i]",
+        "message": "Terme r\u00e9serv\u00e9 dans les identifiants. Utilisez une autre nomenclature."
       }
     ],
     "react/no-unescaped-entities": "off"
